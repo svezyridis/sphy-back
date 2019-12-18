@@ -1,5 +1,7 @@
 package sphy.auth.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class User {
 
     private Integer serialNumber;
@@ -42,7 +44,7 @@ public class User {
     public String getLastName() {
         return lastName;
     }
-
+    @JsonIgnore
     public String getPassword() {
         return password;
     }

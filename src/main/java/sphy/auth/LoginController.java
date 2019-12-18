@@ -5,6 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +42,13 @@ public class LoginController {
     private UserRepository userRepository;
 
     /**
-     *
      * @param username
      * @param password
      * @return a LoginResponse object with of the form
      * {
-     *     status:"success/error"
-     *     token:JWT token if login succeeded null otherwise
-     *     message:error message if any
+     * status:"success/error"
+     * token:JWT token if login succeeded null otherwise
+     * message:error message if any
      * }
      */
     @RequestMapping("/login")
@@ -63,10 +65,18 @@ public class LoginController {
             try {
                 ECPrivateKey privateKey = ECDSA.reconstructPrivateKey(privateKeyStr);
                 Algorithm algorithm = Algorithm.ECDSA256(null, privateKey);
+
+                // Creating Object of ObjectMapper define in Jakson Api
+                ObjectMapper obj = new ObjectMapper();
+                //do not include null values in JSON
+                obj.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                // get User object as a json string
+                String jsonStr = obj.writeValueAsString(user);
+                // Displaying JSON String
+                logger.info(jsonStr);
                 token = JWT.create()
                         .withIssuer(Constants.IDENTIFIER)
-                        .withClaim("user", username)
-                        .withClaim("role", user.getRole())
+                        .withClaim("metadata", jsonStr)
                         .sign(algorithm);
             } catch (InvalidKeySpecException e) {
                 e.printStackTrace();
@@ -74,6 +84,9 @@ public class LoginController {
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
                 return new LoginResponse("error", token, "internal error");
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                return new LoginResponse("error", token, "could not fetch user metadata");
             }
 
             try {
