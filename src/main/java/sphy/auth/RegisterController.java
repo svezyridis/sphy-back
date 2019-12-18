@@ -2,9 +2,7 @@ package sphy.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import org.slf4j.Logger;
@@ -13,19 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import sphy.auth.models.RegisterBody;
+import sphy.auth.models.RegisterResponse;
+import sphy.auth.models.User;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Map;
 
 @RestController
-public class AuthController {
+public class RegisterController {
 
-    Logger logger = LoggerFactory.getLogger(AuthController.class);
+    Logger logger = LoggerFactory.getLogger(LoginController.class);
     @Value("${privateKey}")
     private String privateKeyStr;
 
@@ -39,9 +41,30 @@ public class AuthController {
     @Qualifier("jdbcUserRepository")
     private UserRepository userRepository;
 
+    /**
+     *
+     * @param newRegisterBody Json body of the form:
+     *                        {
+     *                          token:JWT token,
+     *                          newUser:{
+     *                              serialNumber,
+     *                              username,
+     *                              password,
+     *                              firstName,
+     *                              lastName,
+     *                              role,
+     *                              rank
+     *                          }
+     *                      }
+     * @return JSON message of the form:
+     * {
+     *     status:"success/error"
+     *     message: error message (if any)
+     * }
+     */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public RegisterResponse register(@RequestBody RegisterModel newRegisterModel) {
-        String token = newRegisterModel.getToken();
+    public RegisterResponse register(@RequestBody RegisterBody newRegisterBody) {
+        String token = newRegisterBody.getToken();
 
         //Verify token
         DecodedJWT jwt = null;
@@ -61,7 +84,7 @@ public class AuthController {
         }
 
 
-        User user = newRegisterModel.getNewUser();
+        User user = newRegisterBody.getNewUser();
         if (!verifyNewUser(user))
             return new RegisterResponse("error", "missing user attributes");
 
@@ -127,46 +150,8 @@ public class AuthController {
         return new RegisterResponse("success", "user successfully created");
     }
 
-    @RequestMapping("/login")
-    public LoginResponse token(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password) {
-
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            return new LoginResponse("error", null, "user not found");
-        } else if (!BCrypt.checkpw(password, user.getPassword())) {
-            return new LoginResponse("error", null, "wrong password");
-        } else {
-            String token = null;
-            try {
-                ECPrivateKey privateKey = ECDSA.reconstructPrivateKey(privateKeyStr);
-                Algorithm algorithm = Algorithm.ECDSA256(null, privateKey);
-                token = JWT.create()
-                        .withIssuer(Constants.IDENTIFIER)
-                        .withClaim("user", username)
-                        .withClaim("role", user.getRole())
-                        .sign(algorithm);
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-                return new LoginResponse("error", token, "internal error");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                return new LoginResponse("error", token, "internal error");
-            }
-
-            try {
-                DecodedJWT jwt = JWT.decode(token);
-                Map<String, Claim> decoded = jwt.getClaims();
-                decoded.forEach((key, value) -> System.out.println("Key : " + key + " Value : " + value.asString()));
-            } catch (JWTDecodeException exception) {
-                //Invalid token
-            }
-            return new LoginResponse("success", token, "");
-        }
-    }
-
     private boolean verifyNewUser(User user) {
         return user.getPassword() != null && user.getRole() != null && user.getFirstName() != null && user.getLastName() != null
                 && user.getSerialNumber() != null && user.getUsername() != null;
     }
-
 }

@@ -1,4 +1,4 @@
-package sphy.auth;
+package sphy.auth.models;
 
 public class User {
 
@@ -16,6 +16,15 @@ public class User {
 
     private Integer roleID;
 
+    private String rank;
+
+    public String getRank() {
+        return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
+    }
 
     public void setSerialNumber(Integer serialNumber) {
         this.serialNumber = serialNumber;

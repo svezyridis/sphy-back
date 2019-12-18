@@ -7,6 +7,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import sphy.auth.models.User;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @Repository
 public class JdbcUserRepository implements UserRepository {
+
 
     private class UserRowMapper implements RowMapper<User> {
         @Override
@@ -37,30 +40,45 @@ public class JdbcUserRepository implements UserRepository {
         return 0;
     }
 
+    /**
+     *
+     * @return returns all users
+     */
     @Override
     public List<User> findAll() {
-        return jdbcTemplate.query("select *from USERS u inner join ROLES r on u.roleId=r.ID",
+        return jdbcTemplate.query("select *from USER u inner join ROLE r on u.roleId=r.ID",
                 new UserRowMapper()
         );
     }
 
+    /**
+     *
+     * @param username
+     * @return user mapped to User object
+     */
     @Override
     public User findByUsername(String username) {
-        String sql = "select *from USERS u inner join ROLES r on u.roleId=r.ID where username = ?";
+        String sql = "select * from USER u inner join ROLE r on u.roleId=r.ID where username = ?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{username},
                     new UserRowMapper()
             );
-        } catch (EmptyResultDataAccessException e) {
+        } catch (DataAccessException e) {
+            e.printStackTrace();
             return null;
         }
-
     }
+
+    /**
+     *
+     * @param userRole the role to look for
+     * @return the id of the role
+     */
 
     @Override
     public Integer findRoleID(String userRole) {
-        String sql = "select * from ROLES where role = ?";
+        String sql = "select * from ROLE where role = ?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{userRole},
@@ -71,12 +89,17 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
+    /**
+     *
+     * @param user user to add to DB
+     * @return 1 if user successfully created 0 if user exists -1 for other failures
+     */
     @Override
     public int createUser(User user) {
-        String sql = "INSERT INTO USERS (SN,lastName,firstName,username,password,roleID) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO USER (SN,lastName,firstName,username,password,roleID,rank) VALUES (?,?,?,?,?,?,?)";
         int res=0;
         try {
-            res =jdbcTemplate.update(sql, user.getSerialNumber(), user.getLastName(), user.getFirstName(), user.getUsername(), user.getPassword(), user.getRoleID());
+            res =jdbcTemplate.update(sql, user.getSerialNumber(), user.getLastName(), user.getFirstName(), user.getUsername(), user.getPassword(), user.getRoleID(), user.getRank());
         }
         catch (DataAccessException e){
             if(e.getRootCause().getMessage().startsWith("Duplicate entry")){

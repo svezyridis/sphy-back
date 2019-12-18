@@ -1,7 +1,8 @@
 package sphy.auth;
 
+import sphy.auth.models.User;
+
 import java.util.List;
-import java.util.Optional;
 
 public interface UserRepository {
     int update(User user);
