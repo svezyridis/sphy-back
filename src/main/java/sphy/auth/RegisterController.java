@@ -28,8 +28,6 @@ import java.security.spec.InvalidKeySpecException;
 public class RegisterController {
 
     Logger logger = LoggerFactory.getLogger(LoginController.class);
-    @Value("${privateKey}")
-    private String privateKeyStr;
 
     @Value("${publicKey}")
     private String publicKeyStr;

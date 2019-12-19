@@ -77,6 +77,7 @@ public class LoginController {
                 token = JWT.create()
                         .withIssuer(Constants.IDENTIFIER)
                         .withClaim("metadata", jsonStr)
+                        .withClaim("role",user.getRole())
                         .sign(algorithm);
             } catch (InvalidKeySpecException e) {
                 e.printStackTrace();
