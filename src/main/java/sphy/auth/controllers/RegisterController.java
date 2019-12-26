@@ -1,4 +1,4 @@
-package sphy.auth;
+package sphy.auth.controllers;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sphy.Constants;
+import sphy.ECDSA;
+import sphy.auth.db.UserRepository;
 import sphy.auth.models.RegisterBody;
 import sphy.auth.models.RegisterResponse;
 import sphy.auth.models.User;
@@ -74,6 +77,7 @@ public class RegisterController {
                     .build(); //Reusable verifier instance
             jwt = verifier.verify(token);
         } catch (JWTVerificationException exception) {
+            exception.printStackTrace();
             return new RegisterResponse("error", "invalid token");
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
@@ -83,6 +87,7 @@ public class RegisterController {
 
 
         User user = newRegisterBody.getNewUser();
+        System.out.println(user);
         if (!verifyNewUser(user))
             return new RegisterResponse("error", "missing user attributes");
 
@@ -149,6 +154,7 @@ public class RegisterController {
     }
 
     private boolean verifyNewUser(User user) {
+        System.out.println(user.getUsername()+user.getPassword()+user.getRole()+user.getFirstName()+user.getLastName()+user.getSerialNumber());
         return user.getPassword() != null && user.getRole() != null && user.getFirstName() != null && user.getLastName() != null
                 && user.getSerialNumber() != null && user.getUsername() != null;
     }

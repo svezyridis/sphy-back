@@ -1,4 +1,4 @@
-package sphy.auth;
+package sphy;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

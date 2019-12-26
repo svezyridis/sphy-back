@@ -1,4 +1,4 @@
-package sphy.auth;
+package sphy.auth.db;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Integer findRoleID(String userRole) {
-        String sql = "select * from ROLE where role = ?";
+        String sql = "select ID from ROLE where role = ?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{userRole},

@@ -1,4 +1,4 @@
-package sphy.auth;
+package sphy.auth.db;
 
 import sphy.auth.models.User;
 

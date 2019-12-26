@@ -1,6 +1,7 @@
 package sphy.auth.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {
 
@@ -8,6 +9,7 @@ public class User {
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
     private String role;
@@ -44,6 +46,7 @@ public class User {
     public String getLastName() {
         return lastName;
     }
+
     @JsonIgnore
     public String getPassword() {
         return password;
@@ -65,6 +68,7 @@ public class User {
         this.lastName = lastName;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }

@@ -1,4 +1,4 @@
-package sphy.auth;
+package sphy.auth.controllers;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import sphy.Constants;
+import sphy.ECDSA;
+import sphy.auth.db.UserRepository;
 import sphy.auth.models.LoginResponse;
 import sphy.auth.models.User;
 
