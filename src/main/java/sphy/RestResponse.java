@@ -1,4 +1,4 @@
-package sphy.subject.models;
+package sphy;
 
 import java.util.List;
 

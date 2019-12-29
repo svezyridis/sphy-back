@@ -28,6 +28,7 @@ public class JdbcUserRepository implements UserRepository {
             user.setPassword(rs.getString("password"));
             user.setSerialNumber(rs.getInt("SN"));
             user.setUsername(rs.getString("username"));
+            user.setID(rs.getInt("ID"));
             return user;
         }
     }
@@ -37,12 +38,11 @@ public class JdbcUserRepository implements UserRepository {
 
 
     @Override
-    public int update(User user) {
+    public Integer updateUser(User user) {
         return 0;
     }
 
     /**
-     *
      * @return returns all users
      */
     @Override
@@ -53,7 +53,6 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     /**
-     *
      * @param username
      * @return user mapped to User object
      */
@@ -72,7 +71,6 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     /**
-     *
      * @param userRole the role to look for
      * @return the id of the role
      */
@@ -91,26 +89,35 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     /**
-     *
      * @param user user to add to DB
      * @return 1 if user successfully created 0 if user exists -1 for other failures
      */
     @Override
-    public int createUser(User user) {
+    public Integer createUser(User user) {
         String sql = "INSERT INTO USER (SN,lastName,firstName,username,password,roleID,rank) VALUES (?,?,?,?,?,?,?)";
-        int res=0;
+        int res = 0;
         try {
-            res =jdbcTemplate.update(sql, user.getSerialNumber(), user.getLastName(), user.getFirstName(), user.getUsername(), user.getPassword(), user.getRoleID(), user.getRank());
-        }
-        catch (DataAccessException e){
-            if(e.getRootCause().getMessage().startsWith("Duplicate entry")){
+            res = jdbcTemplate.update(sql, user.getSerialNumber(), user.getLastName(), user.getFirstName(), user.getUsername(), user.getPassword(), user.getRoleID(), user.getRank());
+        } catch (DataAccessException e) {
+            if (e.getRootCause().getMessage().startsWith("Duplicate entry")) {
                 return -1;
-            }
-            else return 0;
+            } else return 0;
         }
         return res;
     }
 
-
-
+    @Override
+    public Integer deleteUser(Integer userID) {
+        String sql = "DELETE FROM USER WHERE ID=?";
+        Integer res = -1;
+        try {
+            res = jdbcTemplate.update(sql, userID);
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 }
+
+
+

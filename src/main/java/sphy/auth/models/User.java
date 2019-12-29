@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {
 
+    private Integer ID;
+
     private Integer serialNumber;
 
     private String username;
@@ -89,8 +91,26 @@ public class User {
         this.username = username;
     }
 
+    public Integer getID() {
+        return ID;
+    }
+
+    public void setID(Integer ID) {
+        this.ID = ID;
+    }
+
     @Override
     public String toString() {
-        return "username: "+username+" SN: "+serialNumber+" role: "+role+" first name: "+firstName+" last name: "+lastName+" password: "+password;
+        return "User{" +
+                "ID=" + ID +
+                ", serialNumber=" + serialNumber +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", roleID=" + roleID +
+                ", rank='" + rank + '\'' +
+                '}';
     }
 }

@@ -44,8 +44,9 @@ public class FileSystemStorageService  {
                 Path pathToSave=rootLocation.resolve(Paths.get(relativePath));
                 if(!Files.exists(pathToSave))
                     Files.createDirectories(pathToSave);
-                Files.copy(inputStream, pathToSave.resolve(filename),
-                        StandardCopyOption.REPLACE_EXISTING);
+                //override if image with the same name exists
+                System.out.println(Files.copy(inputStream, pathToSave.resolve(filename),
+                        StandardCopyOption.REPLACE_EXISTING));
             }
         }
         catch (IOException e) {
@@ -91,8 +92,14 @@ public class FileSystemStorageService  {
     }
 
 
-    public void deleteAll() {
-        FileSystemUtils.deleteRecursively(rootLocation.toFile());
+    public boolean delete(String relativePath){
+        try{
+            Path pathToDelete=rootLocation.resolve(Paths.get(relativePath));
+            return Files.deleteIfExists(pathToDelete);
+        }
+        catch (IOException e){
+            throw new StorageException("Could not delete file", e);
+        }
     }
 
     public void init() {
