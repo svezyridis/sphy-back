@@ -78,6 +78,34 @@ public class Validator {
         return true;
     }
 
+    /**
+     *
+     * @param token
+     * @return true if token is valid teacher token, false otherwise
+     */
+    public  boolean validateTeacherToken(String token){
+        String[] arrOfStr = token.split(" ");
+        if(arrOfStr.length>1)
+            token=arrOfStr[1].replace("\"", "");
+        else
+            return false;
+        try {
+            ECPublicKey publicKey = ECDSA.reconstructPublicKey(publicKeyStr);
+            Algorithm algorithm = Algorithm.ECDSA256(publicKey, null);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer(Constants.IDENTIFIER)
+                    .withClaim("role",Constants.TEACHER)
+                    .build();
+            DecodedJWT jwt = verifier.verify(token);
+        } catch (JWTVerificationException e) {
+            return false;
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public DecodedJWT decode(String token){
         System.out.println("TOKEN===="+token);
         String[] arrOfStr = token.split(" ");

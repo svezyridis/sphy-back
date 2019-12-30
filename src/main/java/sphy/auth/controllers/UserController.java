@@ -58,7 +58,7 @@ public class UserController {
      * message:error message if any
      * }
      */
-    @RequestMapping("/user")
+    @RequestMapping("/login")
     public RestResponse token(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password) {
 
         User user = userRepository.findByUsername(username);
