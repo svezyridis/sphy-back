@@ -12,7 +12,9 @@ public class RowMappers {
         public Image mapRow(ResultSet rs, int rowNum) throws SQLException {
             Image image = new Image();
             image.setLabel(rs.getString("label"));
-            image.setURL((rs.getString("URL")));
+            image.setFilename((rs.getString("filename")));
+            image.setSubject(rs.getString("subject"));
+            image.setID(rs.getInt("ID"));
             return image;
         }
     }

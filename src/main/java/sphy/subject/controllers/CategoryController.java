@@ -34,6 +34,7 @@ public class CategoryController {
      * @param token
      * @return all categories of the specified weapon
      */
+    @CrossOrigin(origins = "http://localhost:3000")
     @RequestMapping(value = "category/{weapon}")
     public RestResponse getCategoriesByWeapon(@PathVariable String weapon,@RequestHeader("authorization") String token) {
         if(!validator.simpleValidateToken(token))

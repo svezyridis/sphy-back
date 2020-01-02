@@ -58,6 +58,17 @@ public class SubjectController {
         }
         return new RestResponse("success", subjects, null);
     }
+    @RequestMapping(value = "subject/{name}")
+    public RestResponse getSubjectByCategory(@PathVariable String name, @RequestHeader("authorization") String token) {
+        if (!validator.simpleValidateToken(token))
+            return new RestResponse("error", null, "token is invalid");
+        Subject subject = subjectRepository.getSubjectByName(name);
+        if(subject==null)
+            return new RestResponse("error", null, "subject does not exist");
+            List<Image> images = subjectRepository.getImagesOfSubject(subject.getID());
+            subject.setImages(images);
+        return new RestResponse("success", subject, null);
+    }
 
     /**
      * Creates a new subject

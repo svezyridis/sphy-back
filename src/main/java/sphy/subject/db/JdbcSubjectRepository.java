@@ -54,6 +54,18 @@ public class JdbcSubjectRepository implements SubjectRepository {
     }
 
     @Override
+    public Subject getSubjectByName(String subject) {
+        String sql = "SELECT * FROM SUBJECT WHERE name=?";
+        try {
+            return jdbcTemplate.queryForObject(sql,
+                    new Object[]{subject},
+                    new RowMappers.SubjectRowMapper());
+        } catch (DataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
     public List<Subject> getSubjectsOfCategory(Integer categoryID) {
         String sql = "SELECT * FROM SUBJECT WHERE categoryID=?";
         try {
@@ -69,7 +81,7 @@ public class JdbcSubjectRepository implements SubjectRepository {
 
     @Override
     public List<Image> getImagesOfSubject(Integer subjectID){
-        String sql = "select URL,label from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID WHERE SUBJECT.ID = ? ";
+        String sql = "select filename,label,IMAGE.ID as ID, SUBJECT.name as subject from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID WHERE SUBJECT.ID = ? ";
         try {
             return jdbcTemplate.query(sql,
                     new Object[]{subjectID},
