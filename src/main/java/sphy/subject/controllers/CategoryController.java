@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 public class CategoryController {
-    Logger logger = LoggerFactory.getLogger(SubjectController.class);
+    Logger logger = LoggerFactory.getLogger(CategoryController.class);
     @Autowired
     JdbcTemplate jdbcTemplate;
 

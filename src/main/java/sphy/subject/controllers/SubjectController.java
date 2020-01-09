@@ -1,5 +1,7 @@
 package sphy.subject.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,6 +33,8 @@ public class SubjectController {
     @Autowired
     Validator validator;
 
+    Logger logger = LoggerFactory.getLogger(SubjectController.class);
+
 
     /**
      * @param category name of the requested category
@@ -39,6 +43,7 @@ public class SubjectController {
      */
     @RequestMapping(value = "subject/{weapon}/{category}")
     public RestResponse getSubjectByCategory(@PathVariable String category, @PathVariable String weapon, @RequestHeader("authorization") String token) {
+        logger.info(category+""+weapon);
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
 

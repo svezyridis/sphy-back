@@ -51,6 +51,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
     @Override
     public Integer getCategoryID(String category, Integer weaponID) {
+        System.out.println(category+" "+weaponID);
         String sql = "select ID from CATEGORY where NAME = ? AND weaponID= ?";
         try {
             return jdbcTemplate.queryForObject(sql,
@@ -58,6 +59,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
                     (rs, rowNum) ->
                             rs.getInt("ID"));
         } catch (EmptyResultDataAccessException e) {
+            e.printStackTrace();
             return -1;
         }
     }
