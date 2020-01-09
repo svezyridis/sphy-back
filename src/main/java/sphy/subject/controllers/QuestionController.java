@@ -1,5 +1,7 @@
 package sphy.subject.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +18,7 @@ import java.util.List;
 
 @RestController
 public class QuestionController {
+    Logger logger = LoggerFactory.getLogger(CategoryController.class);
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -32,6 +35,7 @@ public class QuestionController {
 
     @RequestMapping("/question/{subject}")
     public RestResponse getQuestionsBySubject(@PathVariable String subject, @RequestHeader("authorization") String token) {
+        logger.info("[QuestionController]:[getQuestionsBySubject]:{subject: "+subject+" }");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "invalid token");
         Integer subjectID = subjectRepository.getSubjectID(subject);
@@ -47,6 +51,7 @@ public class QuestionController {
 
     @PostMapping("/question/{subject}")
     public RestResponse createQuestion(@PathVariable String subject, @RequestHeader("authorization") String token, @RequestBody NewQuestion questionToAdd){
+        logger.info("[QuestionController]:[createQuestion]:{subject: "+subject+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid ADMIN token");
         Integer subjectID = subjectRepository.getSubjectID(subject);
@@ -63,6 +68,7 @@ public class QuestionController {
 
     @DeleteMapping("/question/{questionID}")
     public RestResponse deleteQuestion(@PathVariable Integer questionID,@RequestHeader("authorization") String token){
+        logger.info("[QuestionController]:[deleteQuestion]:{questionID: "+questionID+" }");
         if(!questionRepository.checkIfExists(questionID))
             return new RestResponse("error",null,"question does not exist");
         Integer res=questionRepository.deleteQuestion(questionID);

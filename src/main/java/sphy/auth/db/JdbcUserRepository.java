@@ -1,6 +1,7 @@
 package sphy.auth.db;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -17,6 +18,7 @@ import java.util.List;
 @Repository
 public class JdbcUserRepository implements UserRepository {
 
+    Logger logger = LoggerFactory.getLogger(JdbcUserRepository.class);
 
     private class UserRowMapper implements RowMapper<User> {
         @Override
@@ -103,6 +105,7 @@ public class JdbcUserRepository implements UserRepository {
                 return -1;
             } else return 0;
         }
+        logger.info("[JdbcUserRepository]:[createUser]:{res : "+res+" }");
         return res;
     }
 
@@ -115,6 +118,7 @@ public class JdbcUserRepository implements UserRepository {
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
+        logger.info("[JdbcUserRepository]:[deleteUser]:{res : "+res+" }");
         return res;
     }
 }

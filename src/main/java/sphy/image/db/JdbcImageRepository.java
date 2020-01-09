@@ -1,5 +1,7 @@
 package sphy.image.db;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Repository;
 public class JdbcImageRepository implements ImageRepository {
     @Autowired
     JdbcTemplate jdbcTemplate;
+    Logger logger = LoggerFactory.getLogger(JdbcImageRepository.class);
 
     @Override
     public Integer addImage(String filename, Integer subjectID, String label) {
@@ -20,6 +23,7 @@ public class JdbcImageRepository implements ImageRepository {
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
+        logger.info("[JdbcImageRepository]:[addImage]:{res: +"+res+" }");
         return res;
     }
 
@@ -32,6 +36,7 @@ public class JdbcImageRepository implements ImageRepository {
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
+        logger.info("[JdbcImageRepository]:[deleteImage]:{res: +"+res+" }");
         return res;
     }
 

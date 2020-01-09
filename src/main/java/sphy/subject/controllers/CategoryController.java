@@ -37,6 +37,7 @@ public class CategoryController {
     @CrossOrigin(origins = "http://localhost:3000")
     @RequestMapping(value = "category/{weapon}")
     public RestResponse getCategoriesByWeapon(@PathVariable String weapon,@RequestHeader("authorization") String token) {
+        logger.info("[CategoryController]:[getCategoriesByWeapon]:{weapon: "+weapon+" }");
         if(!validator.simpleValidateToken(token))
             return new RestResponse("error",null,"token is invalid");
 
@@ -55,6 +56,7 @@ public class CategoryController {
 
     @PostMapping(value = "category/{weapon}/{category}")
     public RestResponse createCategory(@RequestHeader("authorization") String token,@PathVariable String weapon, @PathVariable String category){
+        logger.info("[CategoryController]:[createCategory]:{weapon: "+weapon+", category :"+ category +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
 
@@ -78,6 +80,7 @@ public class CategoryController {
 
     @DeleteMapping(value = "category/{weapon}/{category}")
     public RestResponse deleteCategory(@PathVariable String weapon,@PathVariable String category,@RequestHeader("authorization") String token){
+        logger.info("[CategoryController]:[deleteCategory]:{weapon: "+weapon+", category :"+ category +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
 
@@ -97,6 +100,7 @@ public class CategoryController {
 
     @PutMapping(value = "category/{weapon}/{category}")
     public RestResponse changeCategoryName(@PathVariable String weapon,@PathVariable String category, @RequestParam("name") String newName, @RequestHeader("authorization") String token){
+        logger.info("[CategoryController]:[changeCategoryName]:{weapon: "+weapon+", category :"+ category +", name: "+newName +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
         Integer weaponID = categoryRepository.getWeaponID(weapon);

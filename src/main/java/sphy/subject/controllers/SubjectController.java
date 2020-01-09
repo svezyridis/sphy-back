@@ -43,7 +43,7 @@ public class SubjectController {
      */
     @RequestMapping(value = "subject/{weapon}/{category}")
     public RestResponse getSubjectByCategory(@PathVariable String category, @PathVariable String weapon, @RequestHeader("authorization") String token) {
-        logger.info(category+""+weapon);
+        logger.info("[SubjectController]:[getSubjectByCategory]:{category: "+category+", weapon"+weapon+" }");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
 
@@ -65,6 +65,7 @@ public class SubjectController {
     }
     @RequestMapping(value = "subject/{name}")
     public RestResponse getSubjectByCategory(@PathVariable String name, @RequestHeader("authorization") String token) {
+        logger.info("[SubjectController]:[getSubjectByCategory]:{name: "+name+"}");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
         Subject subject = subjectRepository.getSubjectByName(name);
@@ -90,6 +91,7 @@ public class SubjectController {
      */
     @PostMapping(value = "subject/{weapon}/{category}")
     public RestResponse createSubject(@RequestHeader("authorization") String token, @PathVariable String weapon, @PathVariable String category, @RequestBody NewSubject newSubject) {
+        logger.info("[SubjectController]:[createSubject]:{category: "+category+", weapon"+weapon+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "token is not a valid ADMIN token");
         Subject subjectToAdd = newSubject.getNewSubject();
@@ -115,6 +117,7 @@ public class SubjectController {
 
     @DeleteMapping(value = "subject/{weapon}/{category}/{subject}")
     public RestResponse deleteSubject(@RequestHeader("authorization") String token, @PathVariable String weapon, @PathVariable String category, @PathVariable String subject){
+        logger.info("[SubjectController]:[deleteSubject]:{category: "+category+", weapon"+weapon+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "token is not a valid ADMIN token");
         Integer weaponID = categoryRepository.getWeaponID(weapon);

@@ -32,6 +32,8 @@ import java.util.Map;
 public class UserController {
 
     Logger logger = LoggerFactory.getLogger(UserController.class);
+
+
     @Value("${privateKey}")
     private String privateKeyStr;
 
@@ -62,6 +64,7 @@ public class UserController {
     public RestResponse token(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password) {
 
         User user = userRepository.findByUsername(username);
+
         if (user == null) {
             logger.info("user not found error");
             return new RestResponse("error", null, "user not found");
@@ -80,7 +83,7 @@ public class UserController {
                 // get User object as a json string
                 String jsonStr = obj.writeValueAsString(user);
                 // Displaying JSON String
-                logger.info(jsonStr);
+                logger.info("[UserController]:[token]: "+jsonStr);
                 token = JWT.create()
                         .withIssuer(Constants.IDENTIFIER)
                         .withClaim("metadata", jsonStr)
@@ -104,6 +107,7 @@ public class UserController {
             } catch (JWTDecodeException exception) {
                 //Invalid token
             }
+
             return new RestResponse("success", token, "");
         }
     }
@@ -128,11 +132,12 @@ public class UserController {
      */
     @PostMapping(value = "/user")
     public RestResponse register(@RequestBody NewUser newUser, @RequestHeader("authorization") String token) {
-        logger.info(token);
+        ;
         if(!validator.simpleValidateToken(token))
             return new RestResponse("error", null,"invalid token");
         DecodedJWT jwt = validator.decode(token);
         User user=newUser.getNewUser();
+        logger.info("[UserController]:[register]:{newUser : "+user+"}");
         System.out.println(user);
         if (!verifyNewUser(user))
             return new RestResponse("error",null, "missing user attributes");
@@ -215,6 +220,7 @@ public class UserController {
     @PutMapping(value="/user")
     public RestResponse updateUser(@RequestBody User newUser,@RequestHeader("authorization") String token,@RequestParam(value = "username") String username){
         User oldUser=userRepository.findByUsername(username);
+        logger.info("[UserController]:[updateUser]:{oldUser : "+oldUser+"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");
         if(oldUser==null)
@@ -224,7 +230,7 @@ public class UserController {
     }
 
     private boolean verifyNewUser(User user) {
-        System.out.println(user);
+        logger.info("[UserController]:[verifyNewUser]:{user : "+user+"}");
         return user.getPassword() != null && user.getRole() != null && user.getFirstName() != null && user.getLastName() != null
                 && user.getSerialNumber() != null && user.getUsername() != null;
     }

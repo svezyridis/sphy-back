@@ -1,6 +1,7 @@
 package sphy.image.controllers;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -25,6 +26,7 @@ import java.net.URLConnection;
 @RestController
 public class ImageController {
     private final FileSystemStorageService storageService;
+    Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     @Autowired
     Validator validator;
@@ -54,6 +56,7 @@ public class ImageController {
 
     @RequestMapping(value = "/image/{weapon}/{category}/{subject}/{filename}")
     public ResponseEntity<?> getImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @PathVariable String filename, @RequestHeader("authorization") String token) {
+        logger.info("[ImageController]:[getImage]:{weapon : "+weapon+",category : "+category+",subject : "+subject+ ",filename : "+filename+" }");
         if (!validator.simpleValidateToken(token))
             return new ResponseEntity<String>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
         try {
@@ -70,6 +73,7 @@ public class ImageController {
     @PostMapping("/image/{weapon}/{category}/{subject}")
     public RestResponse addImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject,
                                          @RequestParam("file") MultipartFile file, @RequestParam("label") String label, @RequestHeader("authorization") String token) {
+        logger.info("[ImageController]:[addImage]:{weapon : "+weapon+",category : "+category+",subject : "+subject+ ", label : "+label+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");
         Integer weaponID = categoryRepository.getWeaponID(weapon);
@@ -99,6 +103,7 @@ public class ImageController {
 
     @DeleteMapping(value = "/image/{weapon}/{category}/{subject}/{filename}")
     public RestResponse deleteImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @PathVariable String filename, @RequestHeader("authorization") String token){
+        logger.info("[ImageController]:[addImage]:{weapon : "+weapon+",category : "+category+",subject : "+subject+ ",filename : "+filename+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");
         Integer weaponID = categoryRepository.getWeaponID(weapon);
