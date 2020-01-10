@@ -13,6 +13,7 @@ import sphy.subject.models.NewQuestion;
 import sphy.subject.models.Option;
 import sphy.subject.models.Question;
 import sphy.RestResponse;
+import sphy.subject.models.Subject;
 
 import java.util.List;
 
@@ -38,10 +39,10 @@ public class QuestionController {
         logger.info("[QuestionController]:[getQuestionsBySubject]:{subject: "+subject+" }");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "invalid token");
-        Integer subjectID = subjectRepository.getSubjectID(subject);
-        if(subjectID==-1)
+        Subject sub=subjectRepository.getSubjectByName(subject);
+        if(sub==null)
             return new RestResponse("error",null,"subject does not exist");
-        List<Question> questions = questionRepository.getQuestionsOfSubject(subjectID);
+        List<Question> questions = questionRepository.getQuestionsOfSubject(sub.getID());
         for (Question question : questions) {
             List<Option> options = questionRepository.getOptionsOfQuestion(question.getID());
             question.setOptionList(options);

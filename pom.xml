@@ -9,8 +9,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>sphy</groupId>
-    <artifactId>auth</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>rest</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
     <name>auth</name>
     <description>authentication provider</description>
 

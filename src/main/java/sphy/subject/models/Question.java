@@ -4,10 +4,18 @@ import java.util.List;
 
 public class Question {
     private Integer ID;
-    private Integer subjectID;
     private String text;
     private String answerReference;
     private List<Option> optionList;
+    private String Image;
+
+    public String getImage() {
+        return Image;
+    }
+
+    public void setImage(String image) {
+        Image = image;
+    }
 
     public Integer getID() {
         return ID;
@@ -15,14 +23,6 @@ public class Question {
 
     public void setID(Integer ID) {
         this.ID = ID;
-    }
-
-    public Integer getSubjectID() {
-        return subjectID;
-    }
-
-    public void setSubjectID(Integer subjectID) {
-        this.subjectID = subjectID;
     }
 
     public String getText() {

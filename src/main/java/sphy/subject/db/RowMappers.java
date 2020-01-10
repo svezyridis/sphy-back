@@ -37,8 +37,8 @@ public class RowMappers {
             Question question=new Question();
             question.setID(resultSet.getInt("ID"));
             question.setAnswerReference(resultSet.getString("answerReference"));
-            question.setSubjectID(resultSet.getInt("subjectID"));
             question.setText(resultSet.getString("text"));
+            question.setImage(resultSet.getString("image"));
             return question;
         }
     }
