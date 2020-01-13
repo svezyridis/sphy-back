@@ -5,6 +5,15 @@ public class Category {
     Integer weaponID;
     Image randomImage;
     Integer ID;
+    String URI;
+
+    public String getURI() {
+        return URI;
+    }
+
+    public void setURI(String URI) {
+        this.URI = URI;
+    }
 
     public String getName() {
         return name;

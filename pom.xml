@@ -12,7 +12,7 @@
     <artifactId>rest</artifactId>
     <version>0.0.2-SNAPSHOT</version>
     <name>auth</name>
-    <description>authentication provider</description>
+    <description>SPHY API</description>
 
     <properties>
         <java.version>11</java.version>

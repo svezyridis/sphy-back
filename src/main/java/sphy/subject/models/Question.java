@@ -7,14 +7,23 @@ public class Question {
     private String text;
     private String answerReference;
     private List<Option> optionList;
-    private String Image;
+    private Integer imageID;
+    private  Image image;
 
-    public String getImage() {
-        return Image;
+    public Integer getImageID() {
+        return imageID;
     }
 
-    public void setImage(String image) {
-        Image = image;
+    public void setImageID(Integer imageID) {
+        this.imageID = imageID;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
 
     public Integer getID() {

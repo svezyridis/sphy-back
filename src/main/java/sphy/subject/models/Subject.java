@@ -9,6 +9,15 @@ public class Subject {
     List<Image> images;
     String text;
     Integer ID;
+    String URI;
+
+    public void setURI(String URI) {
+        this.URI = URI;
+    }
+
+    public String getURI() {
+        return URI;
+    }
 
     public void setID(Integer ID) {
         this.ID = ID;

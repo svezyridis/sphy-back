@@ -63,12 +63,12 @@ public class SubjectController {
         }
         return new RestResponse("success", subjects, null);
     }
-    @RequestMapping(value = "subject/{name}")
-    public RestResponse getSubjectByCategory(@PathVariable String name, @RequestHeader("authorization") String token) {
-        logger.info("[SubjectController]:[getSubjectByCategory]:{name: "+name+"}");
+    @RequestMapping(value = "subject/{uri}")
+    public RestResponse getSubjectByCategory(@PathVariable String uri, @RequestHeader("authorization") String token) {
+        logger.info("[SubjectController]:[getSubjectByCategory]:{uri: "+uri+"}");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
-        Subject subject = subjectRepository.getSubjectByName(name);
+        Subject subject = subjectRepository.getSubjectByURI(uri);
         if(subject==null)
             return new RestResponse("error", null, "subject does not exist");
             List<Image> images = subjectRepository.getImagesOfSubject(subject.getID());

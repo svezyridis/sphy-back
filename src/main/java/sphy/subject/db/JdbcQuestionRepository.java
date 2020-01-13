@@ -5,6 +5,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import sphy.subject.models.Image;
 import sphy.subject.models.Option;
 import sphy.subject.models.Question;
 
@@ -30,11 +31,23 @@ public class JdbcQuestionRepository implements QuestionRepository {
 
     @Override
     public List<Option> getOptionsOfQuestion(Integer questionID) {
-        String sql = "SELECT * FROM CHOICE WHERE questionID=?";
+        String sql = "SELECT * FROM OPTIONS WHERE questionID=?";
         try {
             return jdbcTemplate.query(sql,
                     new Object[]{questionID},
                     new RowMappers.OptionRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Image getImageOfQuestion(Integer imageID) {
+        String sql = "select filename,label,IMAGE.ID as ID, SUBJECT.name as subject from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID WHERE IMAGE.ID = ? ";
+        try {
+            return jdbcTemplate.queryForObject(sql,
+                    new Object[]{imageID},
+                    new RowMappers.ImageRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

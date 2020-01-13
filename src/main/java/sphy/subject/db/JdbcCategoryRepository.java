@@ -52,7 +52,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
     @Override
     public Integer getCategoryID(String category, Integer weaponID) {
         System.out.println(category+" "+weaponID);
-        String sql = "select ID from CATEGORY where NAME = ? AND weaponID= ?";
+        String sql = "select ID from CATEGORY where URI = ? AND weaponID= ?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{category,weaponID},
@@ -67,7 +67,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
     @Override
     public Image getRandomImageOfCategory(Integer categoryID){
-        String sql = "select filename,label,SUBJECT.name as subject, IMAGE.ID as ID from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID " +
+        String sql = "select filename,label,SUBJECT.URI as subject, IMAGE.ID as ID from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID " +
                 "INNER JOIN CATEGORY ON CATEGORY.ID = SUBJECT.categoryID WHERE CATEGORY.ID = ? " +
                 "ORDER BY RAND() LIMIT 1";
         try {

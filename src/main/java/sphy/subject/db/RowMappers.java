@@ -27,6 +27,7 @@ public class RowMappers {
             subject.setName(rs.getString("name"));
             subject.setText(rs.getString("text"));
             subject.setCategoryID(rs.getInt("categoryID"));
+            subject.setURI(rs.getString("URI"));
             return subject;
         }
     }
@@ -38,7 +39,7 @@ public class RowMappers {
             question.setID(resultSet.getInt("ID"));
             question.setAnswerReference(resultSet.getString("answerReference"));
             question.setText(resultSet.getString("text"));
-            question.setImage(resultSet.getString("image"));
+            question.setImageID(resultSet.getInt("imageID"));
             return question;
         }
     }
@@ -49,7 +50,6 @@ public class RowMappers {
             Option option=new Option();
             option.setCorrect(resultSet.getBoolean("correct"));
             option.setID(resultSet.getInt("ID"));
-            option.setLetter(resultSet.getString("letter"));
             option.setText(resultSet.getString("text"));
             option.setQuestionID(resultSet.getInt("questionID"));
             return option;
@@ -63,6 +63,7 @@ public class RowMappers {
             category.setID(rs.getInt("ID"));
             category.setName(rs.getString("name"));
             category.setWeaponID(rs.getInt("weaponID"));
+            category.setURI(rs.getString("URI"));
             return category;
         }
     }

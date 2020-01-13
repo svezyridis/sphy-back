@@ -9,11 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import sphy.Validator;
 import sphy.subject.db.QuestionRepository;
 import sphy.subject.db.SubjectRepository;
-import sphy.subject.models.NewQuestion;
-import sphy.subject.models.Option;
-import sphy.subject.models.Question;
+import sphy.subject.models.*;
 import sphy.RestResponse;
-import sphy.subject.models.Subject;
 
 import java.util.List;
 
@@ -39,13 +36,15 @@ public class QuestionController {
         logger.info("[QuestionController]:[getQuestionsBySubject]:{subject: "+subject+" }");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "invalid token");
-        Subject sub=subjectRepository.getSubjectByName(subject);
+        Subject sub=subjectRepository.getSubjectByURI(subject);
         if(sub==null)
             return new RestResponse("error",null,"subject does not exist");
         List<Question> questions = questionRepository.getQuestionsOfSubject(sub.getID());
         for (Question question : questions) {
             List<Option> options = questionRepository.getOptionsOfQuestion(question.getID());
             question.setOptionList(options);
+            Image image=questionRepository.getImageOfQuestion((question.getImageID()));
+            question.setImage(image);
         }
         return new RestResponse("success", questions,null);
     }

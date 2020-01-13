@@ -94,9 +94,10 @@ public class ImageController {
         } catch (StorageException e) {
             return new RestResponse("error", null, "could not save image");
         }
+        //TODO check same image filename
         Integer result = imageRepository.addImage(filename, subjectID, label);
         if (result == -1)
-            return new RestResponse("error", null, "image could not be inserted into database");
+            return new RestResponse("error", null, "image was not be inserted into database");
 
         return new RestResponse("success", null, "image successfully saved");
     }
