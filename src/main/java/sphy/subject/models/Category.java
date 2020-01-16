@@ -3,9 +3,10 @@ package sphy.subject.models;
 public class Category {
     String name;
     Integer weaponID;
-    Image randomImage;
+    Image image;
     Integer ID;
     String URI;
+    Integer imageID;
 
     public String getURI() {
         return URI;
@@ -13,6 +14,22 @@ public class Category {
 
     public void setURI(String URI) {
         this.URI = URI;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImageID(Integer imageID) {
+        this.imageID = imageID;
+    }
+
+    public Integer getImageID() {
+        return imageID;
     }
 
     public String getName() {
@@ -31,14 +48,6 @@ public class Category {
         this.weaponID = weaponID;
     }
 
-    public Image getRandomImage() {
-        return randomImage;
-    }
-
-    public void setRandomImage(Image randomImage) {
-        this.randomImage = randomImage;
-    }
-
     public Integer getID() {
         return ID;
     }
@@ -52,8 +61,10 @@ public class Category {
         return "Category{" +
                 "name='" + name + '\'' +
                 ", weaponID=" + weaponID +
-                ", randomImage=" + randomImage +
+                ", image=" + image +
                 ", ID=" + ID +
+                ", URI='" + URI + '\'' +
+                ", imageID=" + imageID +
                 '}';
     }
 }

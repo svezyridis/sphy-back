@@ -66,13 +66,11 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
 
     @Override
-    public Image getRandomImageOfCategory(Integer categoryID){
-        String sql = "select filename,label,SUBJECT.URI as subject, IMAGE.ID as ID from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID " +
-                "INNER JOIN CATEGORY ON CATEGORY.ID = SUBJECT.categoryID WHERE CATEGORY.ID = ? " +
-                "ORDER BY RAND() LIMIT 1";
+    public Image getImageOfCategory(Integer imageID){
+        String sql = "select filename,label,SUBJECT.URI as subject, IMAGE.ID as ID from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID where IMAGE.ID=?";
         try {
             return jdbcTemplate.queryForObject(sql,
-                    new Object[]{categoryID},
+                    new Object[]{imageID},
                     new RowMappers.ImageRowMapper());
         } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
@@ -81,11 +79,11 @@ public class JdbcCategoryRepository implements CategoryRepository {
     }
 
     @Override
-    public Integer createCategory(String category, Integer weaponID) {
-        String sql = "INSERT INTO CATEGORY (NAME, WEAPONID) VALUES (?,?)";
+    public Integer createCategory(Category category, Integer weaponID) {
+        String sql = "INSERT INTO CATEGORY (NAME, WEAPONID, URI) VALUES (?,?,?)";
         int res=0;
         try {
-            res =jdbcTemplate.update(sql, category,weaponID);
+            res =jdbcTemplate.update(sql, category.getName(),weaponID,category.getURI());
         }
         catch (DataAccessException e){
             e.printStackTrace();

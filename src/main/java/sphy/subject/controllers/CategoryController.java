@@ -34,7 +34,6 @@ public class CategoryController {
      * @param token
      * @return all categories of the specified weapon
      */
-    @CrossOrigin(origins = "http://localhost:3000")
     @RequestMapping(value = "category/{weapon}")
     public RestResponse getCategoriesByWeapon(@PathVariable String weapon,@RequestHeader("authorization") String token) {
         logger.info("[CategoryController]:[getCategoriesByWeapon]:{weapon: "+weapon+" }");
@@ -47,15 +46,15 @@ public class CategoryController {
 
         List<Category> categories = categoryRepository.getCategoriesOfWeapon(weaponID);
         for(Category cat:categories){
-            Image image=categoryRepository.getRandomImageOfCategory(cat.getID());
-            cat.setRandomImage(image);
+            Image image=categoryRepository.getImageOfCategory(cat.getImageID());
+            cat.setImage(image);
             logger.info(cat.toString());
         }
         return new RestResponse("success", categories,null);
     }
 
-    @PostMapping(value = "category/{weapon}/{category}")
-    public RestResponse createCategory(@RequestHeader("authorization") String token,@PathVariable String weapon, @PathVariable String category){
+    @PostMapping(value = "category/{weapon}")
+    public RestResponse createCategory(@RequestHeader("authorization") String token,@PathVariable String weapon, @RequestBody Category category){
         logger.info("[CategoryController]:[createCategory]:{weapon: "+weapon+", category :"+ category +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
@@ -64,7 +63,7 @@ public class CategoryController {
         if(weaponID==-1)
             return new RestResponse("error",null,"weapon does not exist");
 
-        Integer categoryID= categoryRepository.getCategoryID(category,weaponID);
+        Integer categoryID= categoryRepository.getCategoryID(category.getURI(),weaponID);
         if(categoryID!=-1)
             return new RestResponse("error",null,"category already exists");
 
@@ -72,10 +71,7 @@ public class CategoryController {
         if(res==0)
             return new RestResponse("error",null,"category creation failed");
 
-        Category newCategory=new Category();
-        newCategory.setWeaponID(weaponID);
-        newCategory.setName(category);
-        return new RestResponse("success",newCategory,null);
+        return new RestResponse("success",category,null);
     }
 
     @DeleteMapping(value = "category/{weapon}/{category}")

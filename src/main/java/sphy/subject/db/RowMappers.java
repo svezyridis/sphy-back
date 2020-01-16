@@ -64,6 +64,7 @@ public class RowMappers {
             category.setName(rs.getString("name"));
             category.setWeaponID(rs.getInt("weaponID"));
             category.setURI(rs.getString("URI"));
+            category.setImageID(rs.getInt("imageID"));
             return category;
         }
     }
