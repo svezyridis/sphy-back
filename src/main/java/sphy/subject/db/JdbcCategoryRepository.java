@@ -59,7 +59,6 @@ public class JdbcCategoryRepository implements CategoryRepository {
                     (rs, rowNum) ->
                             rs.getInt("ID"));
         } catch (EmptyResultDataAccessException e) {
-            e.printStackTrace();
             return -1;
         }
     }

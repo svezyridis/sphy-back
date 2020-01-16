@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import sphy.subject.db.CategoryRepository;
 import sphy.subject.db.SubjectRepository;
 
 import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
 
 @RestController
@@ -62,7 +64,7 @@ public class ImageController {
         try {
             Resource file = storageService.loadAsResource(weapon + '/' + category + '/' + subject + '/' + filename);
             String mimeType = URLConnection.guessContentTypeFromName(file.getFilename());
-            return ResponseEntity.ok().contentType(MediaType.valueOf(mimeType)).body(file);
+            return ResponseEntity.ok().cacheControl(CacheControl.maxAge(365, TimeUnit.DAYS)).contentType(MediaType.valueOf(mimeType)).body(file);
         } catch (StorageException e) {
             e.printStackTrace();
             return new ResponseEntity<String>("NOT FOUND", HttpStatus.NOT_FOUND);
