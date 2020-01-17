@@ -46,8 +46,9 @@ public class CategoryController {
 
         List<Category> categories = categoryRepository.getCategoriesOfWeapon(weaponID);
         for(Category cat:categories){
-            Image image=categoryRepository.getImageOfCategory(cat.getImageID());
+            Image image=categoryRepository.getImage(cat.getImageID());
             cat.setImage(image);
+            cat.setBranch(weapon);
             logger.info(cat.toString());
         }
         return new RestResponse("success", categories,null);

@@ -57,8 +57,10 @@ public class SubjectController {
 
         List<Subject> subjects = subjectRepository.getSubjectsOfCategory(categoryID);
         for (Subject sub : subjects) {
+            Image image=categoryRepository.getImage(sub.getDefaultImageID());
             List<Image> images = subjectRepository.getImagesOfSubject(sub.getID());
             sub.setImages(images);
+            sub.setDefaultImage(image);
             sub.setCategory(category);
         }
         return new RestResponse("success", subjects, null);

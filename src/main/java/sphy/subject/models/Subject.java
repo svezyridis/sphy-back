@@ -10,6 +10,24 @@ public class Subject {
     String text;
     Integer ID;
     String URI;
+    Image defaultImage;
+    Integer defaultImageID;
+
+    public Integer getDefaultImageID() {
+        return defaultImageID;
+    }
+
+    public void setDefaultImageID(Integer defaultImageID) {
+        this.defaultImageID = defaultImageID;
+    }
+
+    public Image getDefaultImage() {
+        return defaultImage;
+    }
+
+    public void setDefaultImage(Image defaultImage) {
+        this.defaultImage = defaultImage;
+    }
 
     public void setURI(String URI) {
         this.URI = URI;

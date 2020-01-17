@@ -65,7 +65,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
 
     @Override
-    public Image getImageOfCategory(Integer imageID){
+    public Image getImage(Integer imageID){
         String sql = "select filename,label,SUBJECT.URI as subject, IMAGE.ID as ID from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID where IMAGE.ID=?";
         try {
             return jdbcTemplate.queryForObject(sql,

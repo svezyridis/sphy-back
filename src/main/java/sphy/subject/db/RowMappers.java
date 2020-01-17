@@ -28,6 +28,7 @@ public class RowMappers {
             subject.setText(rs.getString("text"));
             subject.setCategoryID(rs.getInt("categoryID"));
             subject.setURI(rs.getString("URI"));
+            subject.setDefaultImageID(rs.getInt("defaultImageID"));
             return subject;
         }
     }
