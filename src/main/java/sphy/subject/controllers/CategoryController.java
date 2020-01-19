@@ -11,6 +11,7 @@ import sphy.Validator;
 import sphy.subject.db.CategoryRepository;
 import sphy.subject.models.Category;
 import sphy.subject.models.Image;
+import sphy.subject.models.Subject;
 
 import java.util.List;
 
@@ -45,13 +46,20 @@ public class CategoryController {
             return new RestResponse("error",null,"weapon does not exist");
 
         List<Category> categories = categoryRepository.getCategoriesOfWeapon(weaponID);
-        for(Category cat:categories){
-            Image image=categoryRepository.getImageOfCategory(cat.getImageID());
-            cat.setImage(image);
-            logger.info(cat.toString());
-        }
         return new RestResponse("success", categories,null);
     }
+
+    @RequestMapping(value = "category/uri/{uri}")
+    public RestResponse getCategoryByURI(@PathVariable String uri, @RequestHeader("authorization") String token) {
+        logger.info("[CategoryController]:[getCategoryByURI]:{uri: "+uri+"}");
+        if (!validator.simpleValidateToken(token))
+            return new RestResponse("error", null, "token is invalid");
+        Category category = categoryRepository.getCategoryByURI(uri);
+        if(category==null)
+            return new RestResponse("error", null, "category does not exist");
+        return new RestResponse("success", category, null);
+    }
+
 
     @PostMapping(value = "category/{weapon}")
     public RestResponse createCategory(@RequestHeader("authorization") String token,@PathVariable String weapon, @RequestBody Category category){
@@ -95,8 +103,8 @@ public class CategoryController {
     }
 
     @PutMapping(value = "category/{weapon}/{category}")
-    public RestResponse changeCategoryName(@PathVariable String weapon,@PathVariable String category, @RequestParam("name") String newName, @RequestHeader("authorization") String token){
-        logger.info("[CategoryController]:[changeCategoryName]:{weapon: "+weapon+", category :"+ category +", name: "+newName +"}");
+    public RestResponse updateCategory(@PathVariable String weapon,@PathVariable String category, @RequestBody Category newCategory, @RequestHeader("authorization") String token){
+        logger.info("[CategoryController]:[updateCategory]:{weapon: "+weapon+", category :"+ category +", newCategory: "+newCategory +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
         Integer weaponID = categoryRepository.getWeaponID(weapon);
@@ -106,7 +114,9 @@ public class CategoryController {
         Integer categoryID= categoryRepository.getCategoryID(category,weaponID);
         if(categoryID==-1)
             return new RestResponse("error",null,"category does not exist");
-        Integer res=categoryRepository.updateCategory(categoryID,newName);
+        newCategory.setID(categoryID);
+        //TODO validate newCateory
+        Integer res=categoryRepository.updateCategory(newCategory);
         if(res==-1)
             return new RestResponse("error",null,"category could not be updated");
         else

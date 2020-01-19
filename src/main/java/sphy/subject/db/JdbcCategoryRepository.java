@@ -21,7 +21,10 @@ public class JdbcCategoryRepository implements CategoryRepository {
      */
     @Override
     public List<Category> getCategoriesOfWeapon(Integer weaponID) {
-        String sql = "SELECT * FROM CATEGORY WHERE weaponID=?";
+        String sql = "SELECT CATEGORY.ID AS ID, CATEGORY.name AS name, weaponID, CATEGORY.URI as URI, IMAGE.ID as imageID, filename, label, SUBJECT.URI as subject " +
+                "FROM CATEGORY LEFT  JOIN IMAGE ON IMAGE.ID = CATEGORY.imageID " +
+                "LEFT JOIN SUBJECT ON SUBJECT.ID = IMAGE.subjectID "+
+                "WHERE weaponID=?";
         try {
             return jdbcTemplate.query(sql,
                     new Object[]{weaponID},
@@ -63,9 +66,24 @@ public class JdbcCategoryRepository implements CategoryRepository {
         }
     }
 
+    @Override
+    public Category getCategoryByURI(String URI) {
+        String sql = "SELECT CATEGORY.ID AS ID, CATEGORY.name AS name, weaponID, CATEGORY.URI as URI, IMAGE.ID as imageID, filename, label, SUBJECT.URI as subject " +
+                "FROM CATEGORY LEFT  JOIN IMAGE ON IMAGE.ID = CATEGORY.imageID " +
+                "LEFT JOIN SUBJECT ON SUBJECT.ID = IMAGE.subjectID "+
+                "WHERE CATEGORY.URI=?";
+        try {
+            return jdbcTemplate.queryForObject(sql,
+                    new Object[]{URI},
+                    new RowMappers.CategoryRowMapper());
+        } catch (DataAccessException e) {
+            return null;
+        }
+    }
+
 
     @Override
-    public Image getImageOfCategory(Integer imageID){
+    public Image getImage(Integer imageID){
         String sql = "select filename,label,SUBJECT.URI as subject, IMAGE.ID as ID from IMAGE INNER JOIN SUBJECT on IMAGE.subjectID=SUBJECT.ID where IMAGE.ID=?";
         try {
             return jdbcTemplate.queryForObject(sql,
@@ -103,11 +121,11 @@ public class JdbcCategoryRepository implements CategoryRepository {
     }
 
     @Override
-    public Integer updateCategory(Integer categoryID, String newName) {
-        String sql = "UPDATE CATEGORY SET name=? WHERE ID=?";
+    public Integer updateCategory(Category category) {
+        String sql = "UPDATE CATEGORY SET name=?, uri=?, imageID=? WHERE ID=?";
         Integer res = -1;
         try {
-            res = jdbcTemplate.update(sql, newName);
+            res = jdbcTemplate.update(sql, category.getName(),category.getURI(),category.getImageID(),category.getID());
         } catch (DataAccessException e) {
             e.printStackTrace();
         }

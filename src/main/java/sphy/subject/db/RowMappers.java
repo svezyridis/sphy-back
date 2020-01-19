@@ -22,12 +22,19 @@ public class RowMappers {
     public static class SubjectRowMapper implements RowMapper<Subject> {
         @Override
         public Subject mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Image image = new Image();
+            image.setLabel(rs.getString("label"));
+            image.setFilename((rs.getString("filename")));
+            image.setID(rs.getInt("imageID"));
+            image.setSubject(rs.getString("URI"));
             Subject subject= new Subject();
             subject.setID(rs.getInt("ID"));
             subject.setName(rs.getString("name"));
-            subject.setText(rs.getString("text"));
+            subject.setGeneral(rs.getString("general"));
+            subject.setUnits(rs.getString("units"));
             subject.setCategoryID(rs.getInt("categoryID"));
             subject.setURI(rs.getString("URI"));
+            subject.setDefaultImage(image);
             return subject;
         }
     }
@@ -59,12 +66,17 @@ public class RowMappers {
     public static class CategoryRowMapper implements RowMapper<Category> {
         @Override
         public Category mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Image image=new Image();
+            image.setFilename(rs.getString("filename"));
+            image.setLabel(rs.getString("label"));
+            image.setID(rs.getInt("imageID"));
+            image.setSubject(rs.getString("subject"));
             Category category = new Category();
             category.setID(rs.getInt("ID"));
             category.setName(rs.getString("name"));
             category.setWeaponID(rs.getInt("weaponID"));
             category.setURI(rs.getString("URI"));
-            category.setImageID(rs.getInt("imageID"));
+            category.setImage(image);
             return category;
         }
     }

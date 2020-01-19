@@ -64,8 +64,8 @@ public class SubjectController {
         return new RestResponse("success", subjects, null);
     }
     @RequestMapping(value = "subject/{uri}")
-    public RestResponse getSubjectByCategory(@PathVariable String uri, @RequestHeader("authorization") String token) {
-        logger.info("[SubjectController]:[getSubjectByCategory]:{uri: "+uri+"}");
+    public RestResponse getSubjectByURI(@PathVariable String uri, @RequestHeader("authorization") String token) {
+        logger.info("[SubjectController]:[getSubjectByURI]:{uri: "+uri+"}");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
         Subject subject = subjectRepository.getSubjectByURI(uri);

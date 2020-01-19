@@ -7,6 +7,15 @@ public class Category {
     Integer ID;
     String URI;
     Integer imageID;
+    String branch;
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
 
     public String getURI() {
         return URI;
