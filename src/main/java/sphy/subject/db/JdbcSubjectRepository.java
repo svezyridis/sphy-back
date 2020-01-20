@@ -16,7 +16,7 @@ public class JdbcSubjectRepository implements SubjectRepository {
 
     @Override
     public Integer getSubjectID(String subject) {
-        String sql = "select ID from SUBJECT where NAME = ?";
+        String sql = "select ID from SUBJECT where URI = ?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{subject},
@@ -30,10 +30,10 @@ public class JdbcSubjectRepository implements SubjectRepository {
 
     @Override
     public Integer createSubject(Subject subject, Integer categoryID) {
-        String sql = "INSERT INTO SUBJECT (categoryID, name,text) VALUES (?,?,?)";
+        String sql = "INSERT INTO SUBJECT (categoryID, name,general, units,URI) VALUES (?,?,?,?,?)";
         int res=0;
         try {
-            res =jdbcTemplate.update(sql, categoryID,subject.getName(),subject.getText());
+            res =jdbcTemplate.update(sql, categoryID,subject.getName(),subject.getGeneral(),subject.getUnits(),subject.getURI());
         }
         catch (DataAccessException e){
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class JdbcSubjectRepository implements SubjectRepository {
 
     @Override
     public Subject getSubjectByURI(String URI) {
-        String sql = "SELECT * FROM SUBJECT WHERE URI=?";
+        String sql = "SELECT SUBJECT.ID as ID, general, units, categoryID, name, URI, defaultImageID, IMAGE.ID as imageID, filename, subjectID, label FROM SUBJECT INNER  JOIN SPHY.IMAGE ON IMAGE.ID = SUBJECT.defaultImageID WHERE URI=?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{URI},
@@ -67,7 +67,7 @@ public class JdbcSubjectRepository implements SubjectRepository {
 
     @Override
     public List<Subject> getSubjectsOfCategory(Integer categoryID) {
-        String sql = "SELECT * FROM SUBJECT WHERE categoryID=?";
+        String sql = "SELECT SUBJECT.ID as ID, general, units, categoryID, name, URI, defaultImageID, IMAGE.ID as imageID, filename, subjectID, label FROM SUBJECT INNER  JOIN SPHY.IMAGE ON IMAGE.ID = SUBJECT.defaultImageID WHERE categoryID=?";
         try {
             return jdbcTemplate.query(sql,
                     new Object[]{categoryID},

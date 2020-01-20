@@ -7,19 +7,12 @@ public class Subject {
     String category;
     String name;
     List<Image> images;
-    String text;
+    String general;
+    String units;
     Integer ID;
     String URI;
     Image defaultImage;
     Integer defaultImageID;
-
-    public Integer getDefaultImageID() {
-        return defaultImageID;
-    }
-
-    public void setDefaultImageID(Integer defaultImageID) {
-        this.defaultImageID = defaultImageID;
-    }
 
     public Image getDefaultImage() {
         return defaultImage;
@@ -27,6 +20,14 @@ public class Subject {
 
     public void setDefaultImage(Image defaultImage) {
         this.defaultImage = defaultImage;
+    }
+
+    public Integer getDefaultImageID() {
+        return defaultImageID;
+    }
+
+    public void setDefaultImageID(Integer defaultImageID) {
+        this.defaultImageID = defaultImageID;
     }
 
     public void setURI(String URI) {
@@ -77,12 +78,21 @@ public class Subject {
         this.images = images;
     }
 
-    public String getText() {
-        return text;
+
+    public String getGeneral() {
+        return general;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setGeneral(String general) {
+        this.general = general;
+    }
+
+    public String getUnits() {
+        return units;
+    }
+
+    public void setUnits(String units) {
+        this.units = units;
     }
 
     @Override
@@ -92,8 +102,12 @@ public class Subject {
                 ", category='" + category + '\'' +
                 ", name='" + name + '\'' +
                 ", images=" + images +
-                ", text='" + text + '\'' +
+                ", general='" + general + '\'' +
+                ", units='" + units + '\'' +
                 ", ID=" + ID +
+                ", URI='" + URI + '\'' +
+                ", defaultImage=" + defaultImage +
+                ", defaultImageID=" + defaultImageID +
                 '}';
     }
 }
