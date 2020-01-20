@@ -11,4 +11,5 @@ public interface SubjectRepository {
     Integer createSubject(Subject subject, Integer categoryID);
     Integer deleteSubject(Integer subjectID);
     Subject getSubjectByURI(String URI);
+    Integer updateSubject(Subject subject);
 }

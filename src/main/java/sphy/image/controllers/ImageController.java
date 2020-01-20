@@ -20,6 +20,7 @@ import sphy.image.storage.StorageFileNotFoundException;
 import sphy.RestResponse;
 import sphy.subject.db.CategoryRepository;
 import sphy.subject.db.SubjectRepository;
+import sphy.subject.models.Subject;
 
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +74,7 @@ public class ImageController {
     }
 
     @PostMapping("/image/{weapon}/{category}/{subject}")
-    public RestResponse addImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject,
+    public RestResponse addImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @RequestParam("isDefault") boolean isDefault,
                                          @RequestParam("file") MultipartFile file, @RequestParam("label") String label, @RequestHeader("authorization") String token) {
         logger.info("[ImageController]:[addImage]:{weapon : "+weapon+",category : "+category+",subject : "+subject+ ", label : "+label+" }");
         if (!validator.validateAdminToken(token))
@@ -100,6 +101,8 @@ public class ImageController {
         Integer result = imageRepository.addImage(filename, subjectID, label);
         if (result == -1)
             return new RestResponse("error", null, "image was not be inserted into database");
+        if(isDefault){
+        }
 
         return new RestResponse("success", null, "image successfully saved");
     }

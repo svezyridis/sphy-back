@@ -4,9 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import sphy.subject.models.Category;
 import sphy.subject.models.Image;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -99,8 +104,18 @@ public class JdbcCategoryRepository implements CategoryRepository {
     public Integer createCategory(Category category, Integer weaponID) {
         String sql = "INSERT INTO CATEGORY (NAME, WEAPONID, URI) VALUES (?,?,?)";
         int res=0;
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         try {
-            res =jdbcTemplate.update(sql, category.getName(),weaponID,category.getURI());
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, category.getName());
+                ps.setInt(2,weaponID);
+                ps.setString(3,category.getURI());
+                return ps;
+            }, keyHolder);
+            System.out.println(keyHolder.getKey().intValue());
+            return  keyHolder.getKey().intValue();
         }
         catch (DataAccessException e){
             e.printStackTrace();
@@ -122,7 +137,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
     @Override
     public Integer updateCategory(Category category) {
-        String sql = "UPDATE CATEGORY SET name=?, uri=?, imageID=? WHERE ID=?";
+        String sql = "UPDATE CATEGORY SET name= IFNULL(?,name), uri=IFNULL(?,uri), imageID=(IFNULL(?,imageID)) WHERE ID=?";
         Integer res = -1;
         try {
             res = jdbcTemplate.update(sql, category.getName(),category.getURI(),category.getImageID(),category.getID());

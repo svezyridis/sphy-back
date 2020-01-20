@@ -57,10 +57,8 @@ public class SubjectController {
 
         List<Subject> subjects = subjectRepository.getSubjectsOfCategory(categoryID);
         for (Subject sub : subjects) {
-            Image image=categoryRepository.getImage(sub.getDefaultImageID());
             List<Image> images = subjectRepository.getImagesOfSubject(sub.getID());
             sub.setImages(images);
-            sub.setDefaultImage(image);
             sub.setCategory(category);
         }
         return new RestResponse("success", subjects, null);
@@ -92,11 +90,10 @@ public class SubjectController {
      * @return error message if any success with the new subject created otherwise
      */
     @PostMapping(value = "subject/{weapon}/{category}")
-    public RestResponse createSubject(@RequestHeader("authorization") String token, @PathVariable String weapon, @PathVariable String category, @RequestBody NewSubject newSubject) {
+    public RestResponse createSubject(@RequestHeader("authorization") String token, @PathVariable String weapon, @PathVariable String category, @RequestBody Subject subject) {
         logger.info("[SubjectController]:[createSubject]:{category: "+category+", weapon"+weapon+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "token is not a valid ADMIN token");
-        Subject subjectToAdd = newSubject.getNewSubject();
         Integer weaponID = categoryRepository.getWeaponID(weapon);
         if (weaponID == -1)
             return new RestResponse("error", null, "weapon does not exist");
@@ -105,16 +102,16 @@ public class SubjectController {
         if (categoryID == -1)
             return new RestResponse("error", null, "category does not exist");
 
-        Integer subjectID = subjectRepository.getSubjectID(subjectToAdd.getName());
+        Integer subjectID = subjectRepository.getSubjectID(subject.getURI());
         if (subjectID != -1)
             return new RestResponse("error", null, "subject already exists");
 
-        int res = subjectRepository.createSubject(subjectToAdd, categoryID);
+        int res = subjectRepository.createSubject(subject, categoryID);
         if (res == 0)
             return new RestResponse("error", null, "subject creation failed");
 
-        subjectToAdd.setCategoryID(categoryID);
-        return new RestResponse("success", subjectToAdd, null);
+        subject.setCategoryID(categoryID);
+        return new RestResponse("success", subject, null);
     }
 
     @DeleteMapping(value = "subject/{weapon}/{category}/{subject}")
