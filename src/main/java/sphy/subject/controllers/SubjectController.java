@@ -91,7 +91,7 @@ public class SubjectController {
      */
     @PostMapping(value = "subject/{weapon}/{category}")
     public RestResponse createSubject(@RequestHeader("authorization") String token, @PathVariable String weapon, @PathVariable String category, @RequestBody Subject subject) {
-        logger.info("[SubjectController]:[createSubject]:{category: "+category+", weapon"+weapon+" }");
+        logger.info("[SubjectController]:[createSubject]:{category: "+category+", weapon: "+weapon+" subject: "+subject+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "token is not a valid ADMIN token");
         Integer weaponID = categoryRepository.getWeaponID(weapon);
@@ -105,12 +105,14 @@ public class SubjectController {
         Integer subjectID = subjectRepository.getSubjectID(subject.getURI());
         if (subjectID != -1)
             return new RestResponse("error", null, "subject already exists");
-
+        //TODO validate subject has all required fields
         int res = subjectRepository.createSubject(subject, categoryID);
-        if (res == 0)
+        if (res == -1)
             return new RestResponse("error", null, "subject creation failed");
 
         subject.setCategoryID(categoryID);
+        subject.setID(res);
+        subject.setCategory(category);
         return new RestResponse("success", subject, null);
     }
 

@@ -102,8 +102,13 @@ public class ImageController {
         if (result == -1)
             return new RestResponse("error", null, "image was not be inserted into database");
         if(isDefault){
+            Subject sub=new Subject();
+            sub.setID(subjectID);
+            sub.setDefaultImageID(result);
+            result=subjectRepository.updateSubject(sub);
+            if (result == -1)
+                return new RestResponse("error", null, "image could not be set as default");
         }
-
         return new RestResponse("success", null, "image successfully saved");
     }
 
