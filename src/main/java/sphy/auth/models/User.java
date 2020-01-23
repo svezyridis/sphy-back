@@ -10,6 +10,7 @@ public class User {
     private Integer serialNumber;
 
     private String username;
+    private  String unit;
 
     @JsonIgnore
     private String password;
@@ -23,6 +24,14 @@ public class User {
     private Integer roleID;
 
     private String rank;
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     public String getRank() {
         return rank;

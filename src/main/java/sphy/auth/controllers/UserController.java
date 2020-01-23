@@ -26,6 +26,7 @@ import sphy.auth.models.User;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -215,6 +216,16 @@ public class UserController {
         if(res==-1)
             return new RestResponse("error", null, "user could not be deleted");
         return new RestResponse("success",user,"user successfully deleted");
+    }
+
+    @RequestMapping(value = "/user")
+    public RestResponse getAllUsers(@RequestHeader("authorization") String token){
+        if(!validator.validateAdminToken(token))
+            return new RestResponse("error", null, "invalid token");
+        List<User> users=userRepository.findAll();
+        if(users==null)
+            return new RestResponse("error", null, "user could not be fetched");
+        return new RestResponse("success",users,null);
     }
 
     @PutMapping(value="/user")

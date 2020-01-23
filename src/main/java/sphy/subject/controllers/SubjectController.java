@@ -135,6 +135,7 @@ public class SubjectController {
         Integer result=subjectRepository.deleteSubject(subjectID);
         if(result==-1)
             return new RestResponse("error", null, "subject could not be deleted");
+        //TODO delete images from file system
         return new RestResponse("success", null, "subject deleted successfully");
     }
 

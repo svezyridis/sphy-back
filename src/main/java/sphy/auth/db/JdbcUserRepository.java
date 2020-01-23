@@ -31,6 +31,8 @@ public class JdbcUserRepository implements UserRepository {
             user.setSerialNumber(rs.getInt("SN"));
             user.setUsername(rs.getString("username"));
             user.setID(rs.getInt("ID"));
+            user.setRank(rs.getString("rank"));
+            user.setUnit(rs.getString("unit"));
             return user;
         }
     }
@@ -49,7 +51,9 @@ public class JdbcUserRepository implements UserRepository {
      */
     @Override
     public List<User> findAll() {
-        return jdbcTemplate.query("select *from USER u inner join ROLE r on u.roleId=r.ID",
+        return jdbcTemplate.query("select role,firstName,lastName,SN,username,password,USER.ID as ID, rank, UNIT.NAME as unit " +
+                        "from USER  inner join ROLE  on USER.roleId=ROLE.ID " +
+                        "INNER JOIN UNIT on USER.unitID = UNIT.ID",
                 new UserRowMapper()
         );
     }
