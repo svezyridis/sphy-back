@@ -6,23 +6,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class User {
 
     private Integer ID;
-
     private Integer serialNumber;
-
     private String username;
     private  String unit;
-
     @JsonIgnore
     private String password;
-
     private String role;
-
     private String firstName;
-
     private String lastName;
-
     private Integer roleID;
-
+    private Integer unitID;
     private String rank;
 
     public String getUnit() {
@@ -31,6 +24,14 @@ public class User {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public void setUnitID(Integer unitID) {
+        this.unitID = unitID;
+    }
+
+    public Integer getUnitID() {
+        return unitID;
     }
 
     public String getRank() {

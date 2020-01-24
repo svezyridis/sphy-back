@@ -8,6 +8,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import sphy.auth.models.Role;
+import sphy.auth.models.Unit;
 import sphy.auth.models.User;
 
 import java.sql.ResultSet;
@@ -33,7 +35,28 @@ public class JdbcUserRepository implements UserRepository {
             user.setID(rs.getInt("ID"));
             user.setRank(rs.getString("rank"));
             user.setUnit(rs.getString("unit"));
+            user.setRoleID(rs.getInt("roleID"));
+            user.setUnitID(rs.getInt("unitID"));
             return user;
+        }
+    }
+
+    private class RoleRowMapper implements RowMapper<Role> {
+        @Override
+        public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Role role = new Role();
+            role.setID(rs.getInt("ID"));
+            role.setRole(rs.getString("role"));
+            return role;
+        }
+    }
+    private class UnitRowMapper implements RowMapper<Unit> {
+        @Override
+        public Unit mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Unit unit=new Unit();
+            unit.setID(rs.getInt("ID"));
+            unit.setName(rs.getString("name"));
+            return unit;
         }
     }
 
@@ -51,7 +74,7 @@ public class JdbcUserRepository implements UserRepository {
      */
     @Override
     public List<User> findAll() {
-        return jdbcTemplate.query("select role,firstName,lastName,SN,username,password,USER.ID as ID, rank, UNIT.NAME as unit " +
+        return jdbcTemplate.query("select role,firstName,lastName,SN,username,password,USER.ID as ID, rank, UNIT.NAME as unit, unitID, roleID " +
                         "from USER  inner join ROLE  on USER.roleId=ROLE.ID " +
                         "INNER JOIN UNIT on USER.unitID = UNIT.ID",
                 new UserRowMapper()
@@ -64,7 +87,9 @@ public class JdbcUserRepository implements UserRepository {
      */
     @Override
     public User findByUsername(String username) {
-        String sql = "select * from USER u inner join ROLE r on u.roleId=r.ID where username = ?";
+        String sql = "select role,firstName,lastName,SN,username,password,USER.ID as ID, rank, UNIT.NAME as unit, unitID, roleID " +
+                "from USER  inner join ROLE  on USER.roleId=ROLE.ID " +
+                "INNER JOIN UNIT on USER.unitID = UNIT.ID  where username = ?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{username},
@@ -76,23 +101,21 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    /**
-     * @param userRole the role to look for
-     * @return the id of the role
-     */
-
     @Override
-    public Integer findRoleID(String userRole) {
-        String sql = "select ID from ROLE where role = ?";
+    public Role findRole(Integer roleID) {
+        String sql = "SELECT * FROM ROLE WHERE ID=?";
         try {
             return jdbcTemplate.queryForObject(sql,
-                    new Object[]{userRole},
-                    (rs, rowNum) ->
-                            rs.getInt("ID"));
-        } catch (EmptyResultDataAccessException e) {
+                    new Object[]{roleID},
+                    new RoleRowMapper()
+            );
+        }
+        catch (DataAccessException e){
+            e.printStackTrace();
             return null;
         }
     }
+
 
     /**
      * @param user user to add to DB
@@ -100,18 +123,19 @@ public class JdbcUserRepository implements UserRepository {
      */
     @Override
     public Integer createUser(User user) {
-        String sql = "INSERT INTO USER (SN,lastName,firstName,username,password,roleID,rank) VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO USER (SN,lastName,firstName,username,password,roleID,rank,unitID) VALUES (?,?,?,?,?,?,?,?)";
         int res = 0;
         try {
-            res = jdbcTemplate.update(sql, user.getSerialNumber(), user.getLastName(), user.getFirstName(), user.getUsername(), user.getPassword(), user.getRoleID(), user.getRank());
+            res = jdbcTemplate.update(sql, user.getSerialNumber(), user.getLastName(), user.getFirstName(), user.getUsername(), user.getPassword(), user.getRoleID(), user.getRank(),user.getUnitID());
         } catch (DataAccessException e) {
             if (e.getRootCause().getMessage().startsWith("Duplicate entry")) {
                 return -1;
             } else return 0;
         }
-        logger.info("[JdbcUserRepository]:[createUser]:{res : "+res+" }");
+        logger.info("[JdbcUserRepository]:[createUser]:{res : " + res + " }");
         return res;
     }
+
 
     @Override
     public Integer deleteUser(Integer userID) {
@@ -122,8 +146,36 @@ public class JdbcUserRepository implements UserRepository {
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
-        logger.info("[JdbcUserRepository]:[deleteUser]:{res : "+res+" }");
+        logger.info("[JdbcUserRepository]:[deleteUser]:{res : " + res + " }");
         return res;
+    }
+
+    @Override
+    public List<Role> getRoles() {
+        String sql = "SELECT * FROM ROLE";
+        try {
+            return jdbcTemplate.query(sql,
+                    new RoleRowMapper()
+            );
+        }
+        catch (DataAccessException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<Unit> getUnits() {
+        String sql = "SELECT * FROM UNIT";
+        try {
+            return jdbcTemplate.query(sql,
+                    new UnitRowMapper()
+            );
+        }
+        catch (DataAccessException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }
 
