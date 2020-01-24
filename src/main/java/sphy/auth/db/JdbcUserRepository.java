@@ -64,7 +64,9 @@ public class JdbcUserRepository implements UserRepository {
      */
     @Override
     public User findByUsername(String username) {
-        String sql = "select * from USER u inner join ROLE r on u.roleId=r.ID where username = ?";
+        String sql = "select role,firstName,lastName,SN,username,password,USER.ID as ID, rank, UNIT.NAME as unit " +
+                "from USER  inner join ROLE  on USER.roleId=ROLE.ID " +
+                "INNER JOIN UNIT on USER.unitID = UNIT.ID where username = ?";
         try {
             return jdbcTemplate.queryForObject(sql,
                     new Object[]{username},

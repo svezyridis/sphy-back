@@ -133,7 +133,7 @@ public class UserController {
      */
     @PostMapping(value = "/user")
     public RestResponse register(@RequestBody NewUser newUser, @RequestHeader("authorization") String token) {
-        ;
+
         if(!validator.simpleValidateToken(token))
             return new RestResponse("error", null,"invalid token");
         DecodedJWT jwt = validator.decode(token);
@@ -207,6 +207,7 @@ public class UserController {
 
     @DeleteMapping(value = "/user")
     public RestResponse deleteUser(@RequestHeader("authorization") String token,@RequestParam(value="username") String username){
+        logger.info(username);
         if(!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");
         User user=userRepository.findByUsername(username);
