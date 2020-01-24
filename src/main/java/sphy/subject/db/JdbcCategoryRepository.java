@@ -59,7 +59,6 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
     @Override
     public Integer getCategoryID(String category, Integer weaponID) {
-        System.out.println(category+" "+weaponID);
         String sql = "select ID from CATEGORY where URI = ? AND weaponID= ?";
         try {
             return jdbcTemplate.queryForObject(sql,
@@ -114,7 +113,6 @@ public class JdbcCategoryRepository implements CategoryRepository {
                 ps.setString(3,category.getURI());
                 return ps;
             }, keyHolder);
-            System.out.println(keyHolder.getKey().intValue());
             return  keyHolder.getKey().intValue();
         }
         catch (DataAccessException e){
