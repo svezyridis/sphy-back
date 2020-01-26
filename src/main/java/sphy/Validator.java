@@ -28,11 +28,6 @@ public class Validator {
      * @return true if token is valid, false otherwise
      */
     public boolean simpleValidateToken(String token) {
-        String[] arrOfStr = token.split(" ");
-        if(arrOfStr.length>1)
-            token=arrOfStr[1].replace("\"", "");
-        else
-            return false;
         try {
             ECPublicKey publicKey = ECDSA.reconstructPublicKey(publicKeyStr);
             Algorithm algorithm = Algorithm.ECDSA256(publicKey, null);
@@ -56,11 +51,6 @@ public class Validator {
      * @return true if token is valid admin token, false otherwise
      */
     public  boolean validateAdminToken(String token){
-        String[] arrOfStr = token.split(" ");
-        if(arrOfStr.length>1)
-            token=arrOfStr[1].replace("\"", "");
-        else
-            return false;
         try {
             ECPublicKey publicKey = ECDSA.reconstructPublicKey(publicKeyStr);
             Algorithm algorithm = Algorithm.ECDSA256(publicKey, null);
@@ -84,11 +74,6 @@ public class Validator {
      * @return true if token is valid teacher token, false otherwise
      */
     public  boolean validateTeacherToken(String token){
-        String[] arrOfStr = token.split(" ");
-        if(arrOfStr.length>1)
-            token=arrOfStr[1].replace("\"", "");
-        else
-            return false;
         try {
             ECPublicKey publicKey = ECDSA.reconstructPublicKey(publicKeyStr);
             Algorithm algorithm = Algorithm.ECDSA256(publicKey, null);

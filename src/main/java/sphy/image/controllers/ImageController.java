@@ -58,7 +58,7 @@ public class ImageController {
     }
 
     @RequestMapping(value = "/image/{weapon}/{category}/{subject}/{filename}")
-    public ResponseEntity<?> getImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @PathVariable String filename, @RequestHeader("authorization") String token) {
+    public ResponseEntity<?> getImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @PathVariable String filename, @CookieValue(value = "jwt", defaultValue = "token") String token) {
         logger.info("[ImageController]:[getImage]:{weapon : "+weapon+",category : "+category+",subject : "+subject+ ",filename : "+filename+" }");
         if (!validator.simpleValidateToken(token))
             return new ResponseEntity<String>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
@@ -75,7 +75,7 @@ public class ImageController {
 
     @PostMapping("/image/{weapon}/{category}/{subject}")
     public RestResponse addImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @RequestParam("isDefault") boolean isDefault,
-                                         @RequestParam("file") MultipartFile file, @RequestParam("label") String label, @RequestHeader("authorization") String token) {
+                                         @RequestParam("file") MultipartFile file, @RequestParam("label") String label, @CookieValue(value = "jwt", defaultValue = "token") String token) {
         logger.info("[ImageController]:[addImage]:{weapon : "+weapon+",category : "+category+",subject : "+subject+ ", label : "+label+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");
@@ -113,7 +113,7 @@ public class ImageController {
     }
 
     @DeleteMapping(value = "/image/{weapon}/{category}/{subject}/{filename}")
-    public RestResponse deleteImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @PathVariable String filename, @RequestHeader("authorization") String token){
+    public RestResponse deleteImage(@PathVariable String weapon, @PathVariable String category, @PathVariable String subject, @PathVariable String filename, @CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[ImageController]:[addImage]:{weapon : "+weapon+",category : "+category+",subject : "+subject+ ",filename : "+filename+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");

@@ -23,6 +23,9 @@ import sphy.Validator;
 import sphy.auth.db.UserRepository;
 import sphy.auth.models.NewUser;
 import sphy.auth.models.User;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.InvalidKeySpecException;
@@ -62,7 +65,7 @@ public class UserController {
      * }
      */
     @RequestMapping("/login")
-    public RestResponse token(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password) {
+    public RestResponse token(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password, HttpServletResponse response) {
 
         User user = userRepository.findByUsername(username);
 
@@ -108,6 +111,11 @@ public class UserController {
             } catch (JWTDecodeException exception) {
                 //Invalid token
             }
+            Cookie cookie = new Cookie("jwt", token);
+            cookie.setMaxAge(7 * 24 * 60 * 60);
+            cookie.setSecure(false);
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
 
             return new RestResponse("success", token, "");
         }
@@ -132,7 +140,7 @@ public class UserController {
      * }
      */
     @PostMapping(value = "/user")
-    public RestResponse register(@RequestBody NewUser newUser, @RequestHeader("authorization") String token) {
+    public RestResponse register(@RequestBody NewUser newUser, @CookieValue(value = "jwt", defaultValue = "token") String token) {
 
         if(!validator.simpleValidateToken(token))
             return new RestResponse("error", null,"invalid token");
@@ -206,7 +214,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/user")
-    public RestResponse deleteUser(@RequestHeader("authorization") String token,@RequestParam(value="username") String username){
+    public RestResponse deleteUser(@CookieValue(value = "jwt", defaultValue = "token") String token,@RequestParam(value="username") String username){
         logger.info(username);
         if(!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");
@@ -220,7 +228,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user")
-    public RestResponse getAllUsers(@RequestHeader("authorization") String token){
+    public RestResponse getAllUsers(@CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");
         List<User> users=userRepository.findAll();
@@ -230,7 +238,7 @@ public class UserController {
     }
 
     @PutMapping(value="/user")
-    public RestResponse updateUser(@RequestBody User newUser,@RequestHeader("authorization") String token,@RequestParam(value = "username") String username){
+    public RestResponse updateUser(@RequestBody User newUser,@CookieValue(value = "jwt", defaultValue = "token") String token,@RequestParam(value = "username") String username){
         User oldUser=userRepository.findByUsername(username);
         logger.info("[UserController]:[updateUser]:{oldUser : "+oldUser+"}");
         if(!validator.validateAdminToken(token))

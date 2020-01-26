@@ -32,7 +32,7 @@ public class QuestionController {
     Validator validator;
 
     @RequestMapping("/question/{subject}")
-    public RestResponse getQuestionsBySubject(@PathVariable String subject, @RequestHeader("authorization") String token) {
+    public RestResponse getQuestionsBySubject(@PathVariable String subject, @CookieValue(value = "jwt", defaultValue = "token") String token) {
         logger.info("[QuestionController]:[getQuestionsBySubject]:{subject: "+subject+" }");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "invalid token");
@@ -50,7 +50,7 @@ public class QuestionController {
     }
 
     @PostMapping("/question/{subject}")
-    public RestResponse createQuestion(@PathVariable String subject, @RequestHeader("authorization") String token, @RequestBody NewQuestion questionToAdd){
+    public RestResponse createQuestion(@PathVariable String subject, @CookieValue(value = "jwt", defaultValue = "token") String token, @RequestBody NewQuestion questionToAdd){
         logger.info("[QuestionController]:[createQuestion]:{subject: "+subject+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid ADMIN token");
@@ -67,7 +67,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("/question/{questionID}")
-    public RestResponse deleteQuestion(@PathVariable Integer questionID,@RequestHeader("authorization") String token){
+    public RestResponse deleteQuestion(@PathVariable Integer questionID,@CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[QuestionController]:[deleteQuestion]:{questionID: "+questionID+" }");
         if(!questionRepository.checkIfExists(questionID))
             return new RestResponse("error",null,"question does not exist");

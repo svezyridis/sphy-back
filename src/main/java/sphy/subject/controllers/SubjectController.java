@@ -42,7 +42,7 @@ public class SubjectController {
      * @return all subjects of the specified category
      */
     @RequestMapping(value = "subject/{weapon}/{category}")
-    public RestResponse getSubjectByCategory(@PathVariable String category, @PathVariable String weapon, @RequestHeader("authorization") String token) {
+    public RestResponse getSubjectByCategory(@PathVariable String category, @PathVariable String weapon, @CookieValue(value = "jwt", defaultValue = "token") String token) {
         logger.info("[SubjectController]:[getSubjectByCategory]:{category: "+category+", weapon"+weapon+" }");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
@@ -64,7 +64,7 @@ public class SubjectController {
         return new RestResponse("success", subjects, null);
     }
     @RequestMapping(value = "subject/{uri}")
-    public RestResponse getSubjectByURI(@PathVariable String uri, @RequestHeader("authorization") String token) {
+    public RestResponse getSubjectByURI(@PathVariable String uri, @CookieValue(value = "jwt", defaultValue = "token") String token) {
         logger.info("[SubjectController]:[getSubjectByURI]:{uri: "+uri+"}");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
@@ -90,7 +90,7 @@ public class SubjectController {
      * @return error message if any success with the new subject created otherwise
      */
     @PostMapping(value = "subject/{weapon}/{category}")
-    public RestResponse createSubject(@RequestHeader("authorization") String token, @PathVariable String weapon, @PathVariable String category, @RequestBody Subject subject) {
+    public RestResponse createSubject(@CookieValue(value = "jwt", defaultValue = "token") String token, @PathVariable String weapon, @PathVariable String category, @RequestBody Subject subject) {
         logger.info("[SubjectController]:[createSubject]:{category: "+category+", weapon: "+weapon+" subject: "+subject+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "token is not a valid ADMIN token");
@@ -117,7 +117,7 @@ public class SubjectController {
     }
 
     @DeleteMapping(value = "subject/{weapon}/{category}/{subject}")
-    public RestResponse deleteSubject(@RequestHeader("authorization") String token, @PathVariable String weapon, @PathVariable String category, @PathVariable String subject){
+    public RestResponse deleteSubject(@CookieValue(value = "jwt", defaultValue = "token") String token, @PathVariable String weapon, @PathVariable String category, @PathVariable String subject){
         logger.info("[SubjectController]:[deleteSubject]:{category: "+category+", weapon"+weapon+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "token is not a valid ADMIN token");

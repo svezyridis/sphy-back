@@ -36,7 +36,8 @@ public class CategoryController {
      * @return all categories of the specified weapon
      */
     @RequestMapping(value = "category/{weapon}")
-    public RestResponse getCategoriesByWeapon(@PathVariable String weapon,@RequestHeader("authorization") String token) {
+    public RestResponse getCategoriesByWeapon(@PathVariable String weapon,@CookieValue(value = "jwt", defaultValue = "token") String token) {
+        System.out.println(token);
         logger.info("[CategoryController]:[getCategoriesByWeapon]:{weapon: "+weapon+" }");
         if(!validator.simpleValidateToken(token))
             return new RestResponse("error",null,"token is invalid");
@@ -50,7 +51,7 @@ public class CategoryController {
     }
 
     @RequestMapping(value = "category/uri/{uri}")
-    public RestResponse getCategoryByURI(@PathVariable String uri, @RequestHeader("authorization") String token) {
+    public RestResponse getCategoryByURI(@PathVariable String uri, @CookieValue(value = "jwt", defaultValue = "token") String token) {
         logger.info("[CategoryController]:[getCategoryByURI]:{uri: "+uri+"}");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "token is invalid");
@@ -62,7 +63,7 @@ public class CategoryController {
 
 
     @PostMapping(value = "category/{weapon}")
-    public RestResponse createCategory(@RequestHeader("authorization") String token,@PathVariable String weapon, @RequestBody Category category){
+    public RestResponse createCategory(@CookieValue(value = "jwt", defaultValue = "token") String token,@PathVariable String weapon, @RequestBody Category category){
         logger.info("[CategoryController]:[createCategory]:{weapon: "+weapon+", category :"+ category +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
@@ -83,7 +84,7 @@ public class CategoryController {
     }
 
     @DeleteMapping(value = "category/{weapon}/{category}")
-    public RestResponse deleteCategory(@PathVariable String weapon,@PathVariable String category,@RequestHeader("authorization") String token){
+    public RestResponse deleteCategory(@PathVariable String weapon,@PathVariable String category,@CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[CategoryController]:[deleteCategory]:{weapon: "+weapon+", category :"+ category +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
@@ -103,7 +104,7 @@ public class CategoryController {
     }
 
     @PutMapping(value = "category/{weapon}/{category}")
-    public RestResponse updateCategory(@PathVariable String weapon,@PathVariable String category, @RequestBody Category newCategory, @RequestHeader("authorization") String token){
+    public RestResponse updateCategory(@PathVariable String weapon,@PathVariable String category, @RequestBody Category newCategory, @CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[CategoryController]:[updateCategory]:{weapon: "+weapon+", category :"+ category +", newCategory: "+newCategory +"}");
         if(!validator.validateAdminToken(token))
             return new RestResponse("error",null,"token is not a valid ADMIN token");
