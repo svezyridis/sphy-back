@@ -1,4 +1,4 @@
 package sphy.evaluation.models;
 
-public class Class {
+public class Answer {
 }

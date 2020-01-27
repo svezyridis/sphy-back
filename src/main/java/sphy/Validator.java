@@ -23,7 +23,6 @@ public class Validator {
         this.publicKeyStr=publicKeyStr;
     }
     /**
-     *
      * @param token
      * @return true if token is valid, false otherwise
      */

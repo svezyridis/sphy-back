@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import sphy.RestResponse;
 import sphy.Validator;
 import sphy.auth.db.UserRepository;
+import sphy.auth.models.User;
 import sphy.evaluation.db.ClassRepository;
+import sphy.evaluation.models.Classroom;
 import sphy.subject.controllers.CategoryController;
-import sphy.subject.db.CategoryRepository;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class ClassesController {
@@ -42,9 +44,37 @@ public class ClassesController {
     public RestResponse createClass(@PathVariable String className, @CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
             return new RestResponse("error", null,"invalid token");
-        String[] arrOfStr = token.split(" ");
-        token=arrOfStr[1].replace("\"", "");
-        System.out.println(token);
+        Integer teacherID=getUserID(token);
+        if(teacherID==null)
+            return new RestResponse("error", null,"teacher id not found in token");
+        Integer result=classRepository.createClass(className,teacherID);
+        Classroom classroom=new Classroom();
+        if(result==-1)
+            return new RestResponse("error", null,"class could not be created");
+        else {
+            classroom.setName(className);
+            classroom.setID(result);
+            classroom.setStudents(new ArrayList<>());
+            classroom.setTests(new ArrayList<>());
+        }
+        return  new RestResponse("success",classroom,"class successfully created");
+    }
+
+    @GetMapping(value = "class")
+    public RestResponse getAllClassesOfTeacher(@CookieValue(value = "jwt", defaultValue = "token") String token){
+        if(!(validator.validateTeacherToken(token)))
+            return new RestResponse("error", null,"invalid token");
+        Integer teacherID=getUserID(token);
+        if(teacherID==null)
+            return new RestResponse("error", null,"teacher id not found in token");
+        List<Classroom> classrooms = classRepository.getAllClassesOfTeacher(teacherID);
+        classrooms.forEach(classroom -> {
+            classroom.setStudents(userRepository.getAllUsersOfClass(classroom.getID()));
+        });
+        return  new RestResponse("success",classrooms,null);
+    }
+
+    private Integer getUserID(String token){
         DecodedJWT decrypted=JWT.decode(token);
         String metadata=decrypted.getClaim("metadata").asString();
         ObjectMapper mapper = new ObjectMapper();
@@ -52,10 +82,8 @@ public class ClassesController {
         try {
             id = mapper.readTree(metadata).get("id").asInt();
         } catch (JsonProcessingException e) {
-            return new RestResponse("error", null,"teacher id not found in token");
+            return id;
         }
-
-
-        return null;
+        return id;
     }
 }

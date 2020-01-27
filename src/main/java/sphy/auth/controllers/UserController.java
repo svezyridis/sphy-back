@@ -247,7 +247,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/role")
-    public RestResponse getRoles(@RequestHeader("authorization") String token){
+    public RestResponse getRoles(@CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
             return new RestResponse("error", null, "invalid token");
         List<Role> roles=userRepository.getRoles();
@@ -257,7 +257,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/unit")
-    public RestResponse getUnits(@RequestHeader("authorization") String token){
+    public RestResponse getUnits(@CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
             return new RestResponse("error", null, "invalid token");
         List<Unit> units=userRepository.getUnits();
