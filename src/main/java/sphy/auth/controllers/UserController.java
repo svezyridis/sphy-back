@@ -22,6 +22,8 @@ import sphy.RestResponse;
 import sphy.Validator;
 import sphy.auth.db.UserRepository;
 import sphy.auth.models.NewUser;
+import sphy.auth.models.Role;
+import sphy.auth.models.Unit;
 import sphy.auth.models.User;
 
 import javax.servlet.http.Cookie;
@@ -153,13 +155,8 @@ public class UserController {
 
 
         user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
-        String newUserRole = user.getRole();
-        Integer roleID = userRepository.findRoleID(newUserRole);
-        if (roleID == null)
-            return new RestResponse("error",null, "role does not exist");
-        else
-            user.setRoleID(roleID);
-
+        Role role = userRepository.findRole(user.getRoleID());
+        String newUserRole = role.getRole();
         //verify role rights
         String CreatorRole = jwt.getClaim("role").asString();
         switch (CreatorRole.toUpperCase()) {
@@ -249,9 +246,29 @@ public class UserController {
         return  null;
     }
 
+    @RequestMapping(value = "/role")
+    public RestResponse getRoles(@RequestHeader("authorization") String token){
+        if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
+            return new RestResponse("error", null, "invalid token");
+        List<Role> roles=userRepository.getRoles();
+        if(roles==null)
+            return new RestResponse("error", null, "roles could not be fetched");
+        return new RestResponse("success",roles,null);
+    }
+
+    @RequestMapping(value = "/unit")
+    public RestResponse getUnits(@RequestHeader("authorization") String token){
+        if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
+            return new RestResponse("error", null, "invalid token");
+        List<Unit> units=userRepository.getUnits();
+        if(units==null)
+            return new RestResponse("error", null, "units could not be fetched");
+        return new RestResponse("success",units,null);
+    }
+
     private boolean verifyNewUser(User user) {
         logger.info("[UserController]:[verifyNewUser]:{user : "+user+"}");
-        return user.getPassword() != null && user.getRole() != null && user.getFirstName() != null && user.getLastName() != null
+        return user.getPassword() != null && user.getRoleID() != null && user.getFirstName() != null && user.getLastName() != null
                 && user.getSerialNumber() != null && user.getUsername() != null;
     }
 }
