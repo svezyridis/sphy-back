@@ -3,6 +3,7 @@ package sphy.evaluation.db;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -91,7 +92,29 @@ public class JdbcClassRepository implements ClassRepository {
     }
 
     @Override
-    public Integer addStudentsToClass(Integer[] studentIDs) {
-        return null;
+    public Integer addStudentsToClass(Integer[] studentIDs,Integer classID) {
+        int res=-1;
+        String sql="INSERT INTO CLASS_STUDENT (CLASSID, USERID) VALUES (?,?)";
+        try{
+            int [] rows=jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                    preparedStatement.setInt(1,classID);
+                    preparedStatement.setInt(2,studentIDs[i]);
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return studentIDs.length;
+                }
+            });
+            res=0;
+            for(int row:rows)
+                res+=row;
+        }
+        catch (DataAccessException e){
+            return res;
+        }
+        return res;
     }
 }

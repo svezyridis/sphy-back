@@ -57,18 +57,18 @@ public class TestController {
     public RestResponse getAllTestsOfClass(@PathVariable Integer classroomID,@CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)||validator.validateUnitAdminToken(token)))
             return new RestResponse("error", null,"invalid token");
-        Integer userID=ClassesController.getUserID(token);
+        Integer userID=validator.getUserID(token);
         if(userID==null)
             return new RestResponse("error", null,"teacher id not found in token");
-        String role=ClassesController.getUserRole(token);
+        String role=validator.getUserRole(token);
         Classroom classroom=classRepository.getClassByID(classroomID);
         if(classroom==null)
             return new RestResponse("error", null,"classroom not found");
-        if (role== Constants.TEACHER){
+        if (role.equals(Constants.TEACHER)){
             if(classroom.getCreatorID()!=userID)
                 return new RestResponse("error", null,"you are not the creator of this class");
         }
-        if(role==Constants.UNIT_ADMIN){
+        if(role.equals(Constants.UNIT_ADMIN)){
             Integer classCreatorUnitID=userRepository.getUnitID(classroom.getCreatorID());
             Integer requesterUnit=userRepository.getUnitID(userID);
             if(classCreatorUnitID!=requesterUnit)

@@ -226,9 +226,19 @@ public class UserController {
 
     @RequestMapping(value = "/user")
     public RestResponse getAllUsers(@CookieValue(value = "jwt", defaultValue = "token") String token){
-        if(!validator.validateAdminToken(token))
+        if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)||validator.validateUnitAdminToken(token)))
             return new RestResponse("error", null, "invalid token");
-        List<User> users=userRepository.findAll();
+        String userRole=validator.getUserRole(token);
+        if(userRole.equals(Constants.ADMIN)){
+            List<User> users=userRepository.findAll();
+            if(users==null)
+                return new RestResponse("error", null, "user could not be fetched");
+            return new RestResponse("success",users,null);
+        }
+        // user is either unit_admin or teacher
+        Integer userID=validator.getUserID(token);
+        Integer unitID=userRepository.getUnitID(userID);
+        List<User> users=userRepository.findAllUsersOfUnit(unitID);
         if(users==null)
             return new RestResponse("error", null, "user could not be fetched");
         return new RestResponse("success",users,null);

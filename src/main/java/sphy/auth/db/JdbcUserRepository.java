@@ -202,6 +202,16 @@ public class JdbcUserRepository implements UserRepository {
             return null;
         }
     }
+
+    @Override
+    public List<User> findAllUsersOfUnit(Integer unitID) {
+        return jdbcTemplate.query("select role,firstName,lastName,SN,username,password,USER.ID as ID, rank, UNIT.NAME as unit, unitID, roleID " +
+                        "from USER  inner join ROLE  on USER.roleId=ROLE.ID " +
+                        "INNER JOIN UNIT on USER.unitID = UNIT.ID where unitID=?",
+                new Object[]{unitID},
+                new UserRowMapper()
+        );
+    }
 }
 
 

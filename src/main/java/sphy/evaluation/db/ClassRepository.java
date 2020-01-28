@@ -11,5 +11,5 @@ public interface ClassRepository {
     List<Classroom> getAllClassesFiltered(ClassFilterParameters parameters);
     List<Classroom> getAllClassesOfTeacher(Integer teacherID);
     Classroom getClassByID(Integer classID);
-    Integer addStudentsToClass(Integer[] studentIDs);
+    Integer addStudentsToClass(Integer[] studentIDs,Integer classID);
 }
