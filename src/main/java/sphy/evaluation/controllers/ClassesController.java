@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 public class ClassesController {
-    Logger logger = LoggerFactory.getLogger(CategoryController.class);
+    Logger logger = LoggerFactory.getLogger(ClassesController.class);
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -74,7 +74,7 @@ public class ClassesController {
         return  new RestResponse("success",classrooms,null);
     }
 
-    private Integer getUserID(String token){
+    public static Integer getUserID(String token){
         DecodedJWT decrypted=JWT.decode(token);
         String metadata=decrypted.getClaim("metadata").asString();
         ObjectMapper mapper = new ObjectMapper();
@@ -85,5 +85,10 @@ public class ClassesController {
             return id;
         }
         return id;
+    }
+
+    public static String getUserRole(String token){
+        DecodedJWT decrypted=JWT.decode(token);
+        return decrypted.getClaim("role").asString();
     }
 }

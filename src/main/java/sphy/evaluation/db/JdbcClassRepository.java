@@ -29,6 +29,7 @@ public class JdbcClassRepository implements ClassRepository {
             classRoom.setName(rs.getString("name"));
             classRoom.setCreationDate(rs.getDate("creationDate"));
             classRoom.setCreatorID(rs.getInt("creatorID"));
+            classRoom.setNoOfTests(rs.getInt("noOfTests"));
             return classRoom;
         }
     }
@@ -64,7 +65,8 @@ public class JdbcClassRepository implements ClassRepository {
 
     @Override
     public List<Classroom> getAllClassesOfTeacher(Integer teacherID) {
-        String sql = "SELECT * FROM CLASS WHERE creatorID=?";
+        String sql = "SELECT CLASS.ID as ID,CLASS.name as name, CLASS.creationDate as creationDate, CLASS.creatorID as creatorID, COUNT(TEST.ID) as noOfTests " +
+                "FROM CLASS LEFT JOIN SPHY.TEST ON CLASS.ID = TEST.classID WHERE creatorID=? GROUP BY CLASS.ID";
         try {
             return jdbcTemplate.query(sql,
                     new Object[]{teacherID},
@@ -75,8 +77,17 @@ public class JdbcClassRepository implements ClassRepository {
     }
 
     @Override
-    public List<User> getAllUsersOfClassroom(Integer classroomID) {
-        return null;
+    public Classroom getClassByID(Integer classID) {
+        String sql = "SELECT * FROM CLASS WHERE ID=?";
+        try {
+            return jdbcTemplate.queryForObject(sql,
+                    new Object[]{classID},
+                    new ClassRowMapper()
+            );
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

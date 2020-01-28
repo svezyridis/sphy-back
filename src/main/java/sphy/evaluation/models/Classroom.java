@@ -12,7 +12,16 @@ public class Classroom {
     Date creationDate;
     List<User> students;
     List<Test> tests;
+    Integer noOfTests;
 
+
+    public Integer getNoOfTests() {
+        return noOfTests;
+    }
+
+    public void setNoOfTests(Integer noOfTests) {
+        this.noOfTests = noOfTests;
+    }
 
     public List<Test> getTests() {
         return tests;

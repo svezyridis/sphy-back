@@ -16,4 +16,5 @@ public interface UserRepository {
     List<Role> getRoles();
     List<Unit> getUnits();
     List<User> getAllUsersOfClass(Integer classID);
+    Integer getUnitID(Integer userID);
 }

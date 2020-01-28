@@ -10,6 +10,6 @@ public interface ClassRepository {
     Integer createClass(String className,Integer creatorID);
     List<Classroom> getAllClassesFiltered(ClassFilterParameters parameters);
     List<Classroom> getAllClassesOfTeacher(Integer teacherID);
-    List<User> getAllUsersOfClassroom(Integer classroomID);
+    Classroom getClassByID(Integer classID);
     Integer addStudentsToClass(Integer[] studentIDs);
 }

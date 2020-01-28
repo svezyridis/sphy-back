@@ -90,6 +90,24 @@ public class Validator {
         return true;
     }
 
+    public  boolean validateUnitAdminToken(String token){
+        try {
+            ECPublicKey publicKey = ECDSA.reconstructPublicKey(publicKeyStr);
+            Algorithm algorithm = Algorithm.ECDSA256(publicKey, null);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer(Constants.IDENTIFIER)
+                    .withClaim("role",Constants.UNIT_ADMIN)
+                    .build();
+            DecodedJWT jwt = verifier.verify(token);
+        } catch (JWTVerificationException e) {
+            return false;
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public DecodedJWT decode(String token){
         System.out.println("TOKEN===="+token);
         String[] arrOfStr = token.split(" ");

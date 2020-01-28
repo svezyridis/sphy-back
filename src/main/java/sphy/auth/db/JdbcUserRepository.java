@@ -189,6 +189,19 @@ public class JdbcUserRepository implements UserRepository {
                 new UserRowMapper()
         );
     }
+
+    @Override
+    public Integer getUnitID(Integer userID) {
+        String sql = "SELECT unitID FROM USER WHERE ID = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{userID}, (rs, rowNum) ->
+                    rs.getInt("unitID")
+            );
+        }
+        catch (DataAccessException e){
+            return null;
+        }
+    }
 }
 
 
