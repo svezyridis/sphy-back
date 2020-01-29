@@ -13,7 +13,16 @@ public class Classroom {
     List<User> students;
     List<Test> tests;
     Integer noOfTests;
+    String unit;
 
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     public Integer getNoOfTests() {
         return noOfTests;

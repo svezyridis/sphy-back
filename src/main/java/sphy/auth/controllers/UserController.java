@@ -106,13 +106,6 @@ public class UserController {
                 return new RestResponse("error", null, "could not fetch user metadata");
             }
 
-            try {
-                DecodedJWT jwt = JWT.decode(token);
-                Map<String, Claim> decoded = jwt.getClaims();
-                decoded.forEach((key, value) -> System.out.println("Key : " + key + " Value : " + value.asString()));
-            } catch (JWTDecodeException exception) {
-                //Invalid token
-            }
             Cookie cookie = new Cookie("jwt", token);
             cookie.setMaxAge(7 * 24 * 60 * 60);
             cookie.setSecure(false);
@@ -141,7 +134,7 @@ public class UserController {
      *     message: error message (if any)
      * }
      */
-    @PostMapping(value = "/user")
+    @PostMapping(value = "/users")
     public RestResponse register(@RequestBody NewUser newUser, @CookieValue(value = "jwt", defaultValue = "token") String token) {
 
         if(!validator.simpleValidateToken(token))
@@ -210,7 +203,7 @@ public class UserController {
         return new RestResponse("success",user, "user " + user.getUsername() + " successfully created");
     }
 
-    @DeleteMapping(value = "/user")
+    @DeleteMapping(value = "/users")
     public RestResponse deleteUser(@CookieValue(value = "jwt", defaultValue = "token") String token,@RequestParam(value="username") String username){
         logger.info(username);
         if(!validator.validateAdminToken(token))
@@ -224,7 +217,7 @@ public class UserController {
         return new RestResponse("success",user,"user successfully deleted");
     }
 
-    @RequestMapping(value = "/user")
+    @RequestMapping(value = "/users")
     public RestResponse getAllUsers(@CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)||validator.validateUnitAdminToken(token)))
             return new RestResponse("error", null, "invalid token");
@@ -244,7 +237,7 @@ public class UserController {
         return new RestResponse("success",users,null);
     }
 
-    @PutMapping(value="/user")
+    @PutMapping(value="/users")
     public RestResponse updateUser(@RequestBody User newUser,@CookieValue(value = "jwt", defaultValue = "token") String token,@RequestParam(value = "username") String username){
         User oldUser=userRepository.findByUsername(username);
         logger.info("[UserController]:[updateUser]:{oldUser : "+oldUser+"}");
@@ -256,7 +249,7 @@ public class UserController {
         return  null;
     }
 
-    @RequestMapping(value = "/role")
+    @RequestMapping(value = "/roles")
     public RestResponse getRoles(@CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
             return new RestResponse("error", null, "invalid token");
@@ -266,7 +259,7 @@ public class UserController {
         return new RestResponse("success",roles,null);
     }
 
-    @RequestMapping(value = "/unit")
+    @RequestMapping(value = "/units")
     public RestResponse getUnits(@CookieValue(value = "jwt", defaultValue = "token") String token){
         if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
             return new RestResponse("error", null, "invalid token");

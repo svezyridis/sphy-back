@@ -12,4 +12,9 @@ public interface ClassRepository {
     List<Classroom> getAllClassesOfTeacher(Integer teacherID);
     Classroom getClassByID(Integer classID);
     Integer addStudentsToClass(Integer[] studentIDs,Integer classID);
+    Integer removeStudentFromClass(Integer classID,Integer studentID);
+    List<Classroom> getAllClassesOfUnit(Integer unitID);
+    List<Classroom> findAll();
+    Integer deleteClass(Integer classID);
+    Integer updateClass(Integer classID,String newName);
 }
