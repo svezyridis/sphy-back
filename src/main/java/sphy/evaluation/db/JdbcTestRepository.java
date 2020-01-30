@@ -139,4 +139,9 @@ public class JdbcTestRepository implements TestRepository {
             return null;
         }
     }
+
+    @Override
+    public Integer addQuestionsToTest(Integer testID, Integer[] questionIDs, Integer noOfQuestions) {
+        return null;
+    }
 }

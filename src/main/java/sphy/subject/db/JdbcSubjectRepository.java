@@ -85,7 +85,7 @@ public class JdbcSubjectRepository implements SubjectRepository {
     @Override
     public Integer updateSubject(Subject subject) {
         String sql = "UPDATE  SUBJECT SET defaultImageID=IFNULL(?,defaultImageID), name=ifnull(?,name)," +
-                "units=ifnull(?,units),general=ifnull(?,general),URI=ifnull(?,URI)  WHERE ID=?";
+                "units=ifnull(?,units),general=ifnull(?,general)  WHERE ID=?";
         Integer res = -1;
         try {
             res = jdbcTemplate.update(sql, subject.getDefaultImageID(), subject.getName(), subject.getUnits(), subject.getGeneral(), subject.getURI(), subject.getID());

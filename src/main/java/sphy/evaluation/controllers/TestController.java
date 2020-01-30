@@ -14,6 +14,7 @@ import sphy.evaluation.db.ClassRepository;
 import sphy.evaluation.db.TestRepository;
 import sphy.evaluation.models.Answer;
 import sphy.evaluation.models.Classroom;
+import sphy.evaluation.models.NewTest;
 import sphy.evaluation.models.Test;
 import sphy.subject.controllers.CategoryController;
 import sphy.subject.db.QuestionRepository;
@@ -51,13 +52,15 @@ public class TestController {
     Validator validator;
 
     @PostMapping("tests")
-    public RestResponse createTest(@RequestBody Test test,@CookieValue(value = "jwt", defaultValue = "token") String token){
+    public RestResponse createTest(@RequestBody NewTest newTest,@CookieValue(value = "jwt", defaultValue = "token") String token){
         if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
             return new RestResponse("error", null, "invalid token");
         Integer userID = validator.getUserID(token);
         if (userID == null)
             return new RestResponse("error", null, "user id not found in token");
         String role = validator.getUserRole(token);
+        Test test=newTest.getTest();
+        System.out.println(newTest);
         Integer classroomID=test.getClassID();
         Classroom classroom = classRepository.getClassByID(classroomID);
         if (classroom == null)
@@ -75,6 +78,9 @@ public class TestController {
         if(result==-1)
             return new RestResponse("error", null, "test could not be created");
         test.setID(result);
+        result=testRepository.addQuestionsToTest(test.getID(),newTest.getCategoryIDs(),newTest.getNoOfQuestions());
+        if(result==-1)
+            return new RestResponse("error", null, "questions could not be added");
         return new RestResponse("success", test, "test created successfully");
     }
 

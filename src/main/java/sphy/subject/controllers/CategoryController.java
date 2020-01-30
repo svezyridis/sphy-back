@@ -35,7 +35,7 @@ public class CategoryController {
      * @param token
      * @return all categories of the specified weapon
      */
-    @RequestMapping(value = "category/{weapon}")
+    @RequestMapping(value = "categories/{weapon}")
     public RestResponse getCategoriesByWeapon(@PathVariable String weapon,@CookieValue(value = "jwt", defaultValue = "token") String token) {
         System.out.println(token);
         logger.info("[CategoryController]:[getCategoriesByWeapon]:{weapon: "+weapon+" }");
@@ -50,7 +50,7 @@ public class CategoryController {
         return new RestResponse("success", categories,null);
     }
 
-    @RequestMapping(value = "category/uri/{uri}")
+    @RequestMapping(value = "categories/uri/{uri}")
     public RestResponse getCategoryByURI(@PathVariable String uri, @CookieValue(value = "jwt", defaultValue = "token") String token) {
         logger.info("[CategoryController]:[getCategoryByURI]:{uri: "+uri+"}");
         if (!validator.simpleValidateToken(token))
@@ -62,7 +62,7 @@ public class CategoryController {
     }
 
 
-    @PostMapping(value = "category/{weapon}")
+    @PostMapping(value = "categories/{weapon}")
     public RestResponse createCategory(@CookieValue(value = "jwt", defaultValue = "token") String token,@PathVariable String weapon, @RequestBody Category category){
         logger.info("[CategoryController]:[createCategory]:{weapon: "+weapon+", category :"+ category +"}");
         if(!validator.validateAdminToken(token))
@@ -83,7 +83,7 @@ public class CategoryController {
         return new RestResponse("success",category,null);
     }
 
-    @DeleteMapping(value = "category/{weapon}/{category}")
+    @DeleteMapping(value = "categories/{weapon}/{category}")
     public RestResponse deleteCategory(@PathVariable String weapon,@PathVariable String category,@CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[CategoryController]:[deleteCategory]:{weapon: "+weapon+", category :"+ category +"}");
         if(!validator.validateAdminToken(token))
@@ -103,7 +103,7 @@ public class CategoryController {
             return new RestResponse("success",null,"category deleted successfully");
     }
 
-    @PutMapping(value = "category/{weapon}/{category}")
+    @PutMapping(value = "categories/{weapon}/{category}")
     public RestResponse updateCategory(@PathVariable String weapon,@PathVariable String category, @RequestBody Category newCategory, @CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[CategoryController]:[updateCategory]:{weapon: "+weapon+", category :"+ category +", newCategory: "+newCategory +"}");
         if(!validator.validateAdminToken(token))

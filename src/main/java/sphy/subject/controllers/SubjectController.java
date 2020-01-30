@@ -115,6 +115,27 @@ public class SubjectController {
         subject.setCategory(category);
         return new RestResponse("success", subject, null);
     }
+    @PutMapping(value = "subject/{weapon}/{category}/{subjectName}")
+    public RestResponse updateSubject(@CookieValue(value = "jwt", defaultValue = "token") String token,@PathVariable String weapon, @PathVariable String category, @PathVariable String subjectName,@RequestBody Subject subject){
+        logger.info("[SubjectController]:[updateSubject]:{newSubject:"+subject+" }");
+        if (!validator.validateAdminToken(token))
+            return new RestResponse("error", null, "token is not a valid ADMIN token");
+        Integer weaponID = categoryRepository.getWeaponID(weapon);
+        if (weaponID == -1)
+            return new RestResponse("error", null, "weapon does not exist");
+
+        Integer categoryID = categoryRepository.getCategoryID(category, weaponID);
+        if (categoryID == -1)
+            return new RestResponse("error", null, "category does not exist");
+
+        Integer subjectID = subjectRepository.getSubjectID(subjectName);
+        if (subjectID == -1)
+            return new RestResponse("error", null, "subject does not exist");
+        Integer result=subjectRepository.updateSubject(subject);
+        if(result==-1)
+            return new RestResponse("error", null, "subject could not be updated");
+        return new RestResponse("success", null, "subject updates successfully");
+    }
 
     @DeleteMapping(value = "subject/{weapon}/{category}/{subject}")
     public RestResponse deleteSubject(@CookieValue(value = "jwt", defaultValue = "token") String token, @PathVariable String weapon, @PathVariable String category, @PathVariable String subject){

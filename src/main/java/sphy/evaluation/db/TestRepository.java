@@ -14,4 +14,5 @@ public interface TestRepository {
     List<Answer> getAllAnswersOfTest(Integer testID);
     Integer updateTest(Test test);
     Test getTestByID(Integer testID);
+    Integer addQuestionsToTest(Integer testID,Integer [] questionIDs,Integer noOfQuestions);
 }
