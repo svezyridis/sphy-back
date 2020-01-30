@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sphy.Constants;
 import sphy.RestResponse;
 import sphy.Validator;
@@ -53,41 +50,40 @@ public class TestController {
     @Autowired
     Validator validator;
 
-    @RequestMapping("test/{classroomID}")
-    public RestResponse getAllTestsOfClass(@PathVariable Integer classroomID,@CookieValue(value = "jwt", defaultValue = "token") String token){
-        if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)||validator.validateUnitAdminToken(token)))
-            return new RestResponse("error", null,"invalid token");
-        Integer userID=validator.getUserID(token);
-        if(userID==null)
-            return new RestResponse("error", null,"teacher id not found in token");
-        String role=validator.getUserRole(token);
-        Classroom classroom=classRepository.getClassByID(classroomID);
-        if(classroom==null)
-            return new RestResponse("error", null,"classroom not found");
-        if (role.equals(Constants.TEACHER)){
-            if(classroom.getCreatorID()!=userID)
-                return new RestResponse("error", null,"you are not the creator of this class");
+    @RequestMapping("tests")
+    public RestResponse getAllTestsOfClass(@RequestParam(value = "classID" ) Integer classroomID, @CookieValue(value = "jwt", defaultValue = "token") String token) {
+        if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
+            return new RestResponse("error", null, "invalid token");
+        Integer userID = validator.getUserID(token);
+        if (userID == null)
+            return new RestResponse("error", null, "user id not found in token");
+        String role = validator.getUserRole(token);
+        Classroom classroom = classRepository.getClassByID(classroomID);
+        if (classroom == null)
+            return new RestResponse("error", null, "classroom not found");
+        if (role.equals(Constants.TEACHER)&&(!classroom.getCreatorID().equals(userID))) {
+                return new RestResponse("error", null, "you are not the creator of this class");
         }
-        if(role.equals(Constants.UNIT_ADMIN)){
-            Integer classCreatorUnitID=userRepository.getUnitID(classroom.getCreatorID());
-            Integer requesterUnit=userRepository.getUnitID(userID);
-            if(classCreatorUnitID!=requesterUnit)
-                return new RestResponse("error", null,"this class does not belong to your unit");
+        if (role.equals(Constants.UNIT_ADMIN)) {
+            Integer classCreatorUnitID = userRepository.getUnitID(classroom.getCreatorID());
+            Integer requesterUnit = userRepository.getUnitID(userID);
+            if (!classCreatorUnitID.equals(requesterUnit))
+                return new RestResponse("error", null, "this class does not belong to your unit");
         }
-        List<Test> tests=testRepository.getAllTestsOfClass(classroomID);
+        List<Test> tests = testRepository.getAllTestsOfClass(classroomID);
         tests.forEach(test -> {
-            List<Question> questions=testRepository.getAllQuestionsOfTest(test.getID());
+            List<Question> questions = testRepository.getAllQuestionsOfTest(test.getID());
             for (Question question : questions) {
                 List<Option> options = questionRepository.getOptionsOfQuestion(question.getID());
                 question.setOptionList(options);
-                Image image=questionRepository.getImageOfQuestion((question.getImageID()));
+                Image image = questionRepository.getImageOfQuestion((question.getImageID()));
                 question.setImage(image);
             }
             test.setQuestions(questions);
             test.setAnswers(testRepository.getAllAnswersOfTest(test.getID()));
         });
 
-        return new RestResponse("success", tests,null);
+        return new RestResponse("success", tests, null);
     }
 
 }

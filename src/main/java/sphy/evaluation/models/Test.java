@@ -80,4 +80,18 @@ public class Test {
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
     }
+
+    @Override
+    public String toString() {
+        return "Test{" +
+                "ID=" + ID +
+                ", classID=" + classID +
+                ", name='" + name + '\'' +
+                ", duration=" + duration +
+                ", creationDate=" + creationDate +
+                ", activationTime=" + activationTime +
+                ", questions=" + questions +
+                ", answers=" + answers +
+                '}';
+    }
 }

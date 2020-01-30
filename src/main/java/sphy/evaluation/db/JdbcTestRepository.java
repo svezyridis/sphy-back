@@ -23,8 +23,13 @@ public class JdbcTestRepository implements TestRepository {
     public static class TestRowMapper implements RowMapper<Test> {
         @Override
         public Test mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Test test=new Test();
-
+            Test test = new Test();
+            test.setID(rs.getInt("ID"));
+            test.setClassID(rs.getInt("classID"));
+            test.setName(rs.getString("name"));
+            test.setDuration(rs.getInt("duration"));
+            test.setCreationDate(rs.getDate("creationDate"));
+            test.setActivationTime(rs.getTimestamp("activationTime") != null ? rs.getTimestamp("activationTime").toLocalDateTime() : null);
             return test;
         }
     }
@@ -32,7 +37,7 @@ public class JdbcTestRepository implements TestRepository {
     public static class AnswerRowMapper implements RowMapper<Answer> {
         @Override
         public Answer mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Answer answer=new Answer();
+            Answer answer = new Answer();
             answer.setChoiceID(rs.getInt("choiceID"));
             answer.setQuestionID(rs.getInt("questionID"));
             answer.setUserID(rs.getInt("userID"));

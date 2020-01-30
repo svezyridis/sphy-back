@@ -136,18 +136,14 @@ public class UserController {
      */
     @PostMapping(value = "/users")
     public RestResponse register(@RequestBody NewUser newUser, @CookieValue(value = "jwt", defaultValue = "token") String token) {
-
-        if(!validator.simpleValidateToken(token))
+        if(!(validator.validateUnitAdminToken(token)||validator.validateAdminToken(token)||validator.validateTeacherToken(token)))
             return new RestResponse("error", null,"invalid token");
         DecodedJWT jwt = validator.decode(token);
         User user=newUser.getNewUser();
-        logger.info("[UserController]:[register]:{newUser : "+user+"}");
-        System.out.println(user);
         if (!verifyNewUser(user))
             return new RestResponse("error",null, "missing user attributes");
-
-
         user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        logger.info("[UserController]:[register]:{newUser : "+user+"}");
         Role role = userRepository.findRole(user.getRoleID());
         String newUserRole = role.getRole();
         //verify role rights
@@ -203,8 +199,8 @@ public class UserController {
         return new RestResponse("success",user, "user " + user.getUsername() + " successfully created");
     }
 
-    @DeleteMapping(value = "/users")
-    public RestResponse deleteUser(@CookieValue(value = "jwt", defaultValue = "token") String token,@RequestParam(value="username") String username){
+    @DeleteMapping(value = "/users/{username}")
+    public RestResponse deleteUser(@CookieValue(value = "jwt", defaultValue = "token") String token,@PathVariable String username){
         logger.info(username);
         if(!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid token");

@@ -58,11 +58,9 @@ public class ClassesController {
 
     @PostMapping(value = "classes/{classID}/students")
     public RestResponse addUserToClass(@PathVariable Integer classID, @RequestBody Integer[] userIDs, @CookieValue(value = "jwt", defaultValue = "token") String token) {
-        if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token)))
-            return new RestResponse("error", null, "invalid token");
-        Integer userID = validator.getUserID(token);
-        if (userID == null)
-            return new RestResponse("error", null, "id not found in token");
+        RestResponse restResponse=verifyUserRights(token,classID);
+        if(restResponse!=null)
+            return restResponse;
         Integer result = classRepository.addStudentsToClass(userIDs, classID);
         if (result == -1)
             return new RestResponse("error", null, "users could not be added");
@@ -73,23 +71,9 @@ public class ClassesController {
 
     @DeleteMapping(value = "classes/{classID}/students/{studentID}")
     public RestResponse removeUserFromClass(@PathVariable Integer classID, @CookieValue(value = "jwt", defaultValue = "token") String token,@PathVariable Integer studentID) {
-        if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
-            return new RestResponse("error", null, "invalid token");
-        Integer userID = validator.getUserID(token);
-        if (userID == null)
-            return new RestResponse("error", null, "id not found in token");
-        String userRole = validator.getUserRole(token);
-        Classroom classroom = classRepository.getClassByID(classID);
-        if (classroom == null)
-            return new RestResponse("error", null, "class not found");
-        switch (userRole) {
-            case Constants.TEACHER:
-                if (classroom.getCreatorID() != userID)
-                    return new RestResponse("error", null, "you can only edit your classes");
-            case Constants.UNIT_ADMIN:
-                if (userRepository.getUnitID(classroom.getCreatorID()) != userRepository.getUnitID(userID))
-                    return new RestResponse("error", null, "you can only edit classes of your unit");
-        }
+        RestResponse restResponse=verifyUserRights(token,classID);
+        if(restResponse!=null)
+            return restResponse;
         Integer result = classRepository.removeStudentFromClass(classID, studentID);
         if (result == -1)
             return new RestResponse("error", null, "student could not be deleted");
@@ -98,23 +82,9 @@ public class ClassesController {
 
     @DeleteMapping(value = "classes/{classID}")
     public RestResponse deleteClass(@PathVariable Integer classID, @CookieValue(value = "jwt", defaultValue = "token") String token) {
-        if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
-            return new RestResponse("error", null, "invalid token");
-        Integer userID = validator.getUserID(token);
-        if (userID == null)
-            return new RestResponse("error", null, "id not found in token");
-        String userRole = validator.getUserRole(token);
-        Classroom classroom = classRepository.getClassByID(classID);
-        if (classroom == null)
-            return new RestResponse("error", null, "class not found");
-        switch (userRole) {
-            case Constants.TEACHER:
-                if (classroom.getCreatorID() != userID)
-                    return new RestResponse("error", null, "you can only delete your classes");
-            case Constants.UNIT_ADMIN:
-                if (userRepository.getUnitID(classroom.getCreatorID()) != userRepository.getUnitID(userID))
-                    return new RestResponse("error", null, "you can only delete classes of your unit");
-        }
+        RestResponse restResponse=verifyUserRights(token,classID);
+        if(restResponse!=null)
+            return restResponse;
         Integer result = classRepository.deleteClass(classID);
         if (result == -1)
             return new RestResponse("error", null, "class could not be deleted");
@@ -128,7 +98,7 @@ public class ClassesController {
             return new RestResponse("error", null, "invalid token");
         Integer userID = validator.getUserID(token);
         if (userID == null)
-            return new RestResponse("error", null, "teacher id not found in token");
+            return new RestResponse("error", null, "user id not found in token");
         String userRole = validator.getUserRole(token);
         List<Classroom> classrooms = null;
         switch (userRole) {
@@ -161,16 +131,26 @@ public class ClassesController {
     }
 
     @PutMapping(value = "classes/{classID}")
-    public RestResponse deleteClass(@PathVariable Integer classID, @CookieValue(value = "jwt", defaultValue = "token") String token,@RequestBody String newName) {
+    public RestResponse updateClass(@PathVariable Integer classID, @CookieValue(value = "jwt", defaultValue = "token") String token,@RequestBody String newName) {
+        RestResponse restResponse=verifyUserRights(token,classID);
+        if(restResponse!=null)
+            return restResponse;
+        Integer result = classRepository.updateClass(classID,newName);
+        if (result == -1)
+            return new RestResponse("error", null, "class could not be updated");
+        return new RestResponse("success", null, "class updated successfully");
+    }
+
+    private  RestResponse verifyUserRights(String token ,Integer classID){
         if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
             return new RestResponse("error", null, "invalid token");
         Integer userID = validator.getUserID(token);
         if (userID == null)
             return new RestResponse("error", null, "id not found in token");
-        String userRole = validator.getUserRole(token);
         Classroom classroom = classRepository.getClassByID(classID);
         if (classroom == null)
             return new RestResponse("error", null, "class not found");
+        String userRole = validator.getUserRole(token);
         switch (userRole) {
             case Constants.TEACHER:
                 if (classroom.getCreatorID() != userID)
@@ -179,10 +159,7 @@ public class ClassesController {
                 if (userRepository.getUnitID(classroom.getCreatorID()) != userRepository.getUnitID(userID))
                     return new RestResponse("error", null, "you can only edit classes of your unit");
         }
-        Integer result = classRepository.updateClass(classID,newName);
-        if (result == -1)
-            return new RestResponse("error", null, "class could not be updated");
-        return new RestResponse("success", null, "class updated successfully");
+        return null;
     }
 
 }
