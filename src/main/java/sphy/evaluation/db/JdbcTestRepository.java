@@ -1,9 +1,12 @@
 package sphy.evaluation.db;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import sphy.evaluation.models.Answer;
 import sphy.evaluation.models.Classroom;
@@ -11,8 +14,10 @@ import sphy.evaluation.models.Test;
 import sphy.subject.db.RowMappers;
 import sphy.subject.models.Question;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -29,7 +34,8 @@ public class JdbcTestRepository implements TestRepository {
             test.setName(rs.getString("name"));
             test.setDuration(rs.getInt("duration"));
             test.setCreationDate(rs.getDate("creationDate"));
-            test.setActivationTime(rs.getTimestamp("activationTime") != null ? rs.getTimestamp("activationTime").toLocalDateTime() : null);
+            test.setActivationTime(rs.getTimestamp("activationTime"));
+            test.setCompletionTime(rs.getTimestamp("completionTime"));
             return test;
         }
     }
@@ -47,13 +53,25 @@ public class JdbcTestRepository implements TestRepository {
     }
 
     @Override
-    public Integer createTestForClass(Test test, Integer classID) {
-        return null;
-    }
-
-    @Override
-    public Integer initializeTest(Integer testID) {
-        return null;
+    public Integer createTest(Test test) {
+        String sql = "INSERT INTO TEST (classID, name, duration) VALUES (?,?,?)";
+        Integer result=-1;
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, test.getClassID());
+                ps.setString(2,test.getName());
+                ps.setInt(3,test.getDuration());
+                return ps;
+            }, keyHolder);
+            return  keyHolder.getKey().intValue();
+        }
+        catch (DataAccessException e){
+            e.printStackTrace();
+            return result;
+        }
     }
 
     @Override
@@ -93,6 +111,30 @@ public class JdbcTestRepository implements TestRepository {
             return jdbcTemplate.query(sql,
                     new Object[]{testID},
                     new AnswerRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Integer updateTest(Test test) {
+        String sql = "UPDATE  TEST SET activationTime=ifnull(?,activationTime),completionTime=ifnull(?,completionTime) WHERE ID=?";
+        Integer res = -1;
+        try {
+            res = jdbcTemplate.update(sql,test.getActivationTime(),test.getCompletionTime(),test.getID());
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public Test getTestByID(Integer testID) {
+        String sql = "SELECT * FROM TEST WHERE ID=?";
+        try {
+            return jdbcTemplate.queryForObject(sql,
+                    new Object[]{testID},
+                    new TestRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

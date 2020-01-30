@@ -7,10 +7,11 @@ import sphy.subject.models.Question;
 import java.util.List;
 
 public interface TestRepository {
-    Integer createTestForClass(Test test, Integer classID);
-    Integer initializeTest(Integer testID);
+    Integer createTest(Test test);
     Integer submitAnswers(Integer testID, Integer studentID, Answer[] answers);
     List<Test> getAllTestsOfClass(Integer classID);
     List<Question> getAllQuestionsOfTest(Integer testID);
     List<Answer> getAllAnswersOfTest(Integer testID);
+    Integer updateTest(Test test);
+    Test getTestByID(Integer testID);
 }

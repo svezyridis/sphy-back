@@ -1,9 +1,10 @@
 package sphy.evaluation.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import sphy.subject.models.Question;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class Test {
@@ -13,9 +14,20 @@ public class Test {
     //in minutes
     Integer duration;
     Date creationDate;
-    LocalDateTime activationTime;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm")
+    Timestamp activationTime;
     List<Question> questions;
     List<Answer> answers;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm")
+    Timestamp completionTime;
+
+    public Timestamp getCompletionTime() {
+        return completionTime;
+    }
+
+    public void setCompletionTime(Timestamp completionTime) {
+        this.completionTime = completionTime;
+    }
 
     public Integer getID() {
         return ID;
@@ -57,11 +69,11 @@ public class Test {
         this.creationDate = creationDate;
     }
 
-    public LocalDateTime getActivationTime() {
+    public Timestamp getActivationTime() {
         return activationTime;
     }
 
-    public void setActivationTime(LocalDateTime activationTime) {
+    public void setActivationTime(Timestamp activationTime) {
         this.activationTime = activationTime;
     }
 
