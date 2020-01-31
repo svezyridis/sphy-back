@@ -81,7 +81,9 @@ public class JdbcTestRepository implements TestRepository {
 
     @Override
     public List<Test> getAllTestsOfClass(Integer classID) {
-        String sql = "SELECT * FROM TEST WHERE classID=?";
+        String sql = "SELECT TEST.ID as ID,TEST.classID as classID,TEST.activationTime as activationTime,TEST.completionTime as completitionTime, TEST.creationDate as creationTime,TEST.duration as duration, TEST.name as name," +
+                "q.ID as questionID, " +
+                " FROM TEST LEFT JOIN TEST_QUESTION TQ on TEST.ID = TQ.testID INNER JOIN QUESTION Q on TQ.questionID = Q.ID INNER JOIN OPTIONS O on Q.ID = O.questionID WHERE classID=?";
         try {
             return jdbcTemplate.query(sql,
                     new Object[]{classID},

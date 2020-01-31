@@ -131,6 +131,7 @@ public class SubjectController {
         Integer subjectID = subjectRepository.getSubjectID(subjectName);
         if (subjectID == -1)
             return new RestResponse("error", null, "subject does not exist");
+        subject.setID(subjectID);
         Integer result=subjectRepository.updateSubject(subject);
         if(result==-1)
             return new RestResponse("error", null, "subject could not be updated");

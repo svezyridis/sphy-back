@@ -86,6 +86,7 @@ public class TestController {
 
     @RequestMapping("tests")
     public RestResponse getAllTestsOfClass(@RequestParam(value = "classID") Integer classroomID, @CookieValue(value = "jwt", defaultValue = "token") String token) {
+        long startTIme=System.nanoTime();
         if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
             return new RestResponse("error", null, "invalid token");
         Integer userID = validator.getUserID(token);
@@ -104,7 +105,15 @@ public class TestController {
             if (!classCreatorUnitID.equals(requesterUnit))
                 return new RestResponse("error", null, "this class does not belong to your unit");
         }
+        long endTime=System.nanoTime();
+        long elapsedTime=endTime-startTIme;
+        System.out.println("execution time to validate in ms"+elapsedTime/1000000);
+        startTIme=System.nanoTime();
         List<Test> tests = testRepository.getAllTestsOfClass(classroomID);
+        endTime=System.nanoTime();
+        elapsedTime=endTime-startTIme;
+        System.out.println("execution time to get tests in ms"+elapsedTime/1000000);
+        startTIme=System.nanoTime();
         tests.forEach(test -> {
             List<Question> questions = testRepository.getAllQuestionsOfTest(test.getID());
             for (Question question : questions) {
@@ -116,6 +125,9 @@ public class TestController {
             test.setQuestions(questions);
             test.setAnswers(testRepository.getAllAnswersOfTest(test.getID()));
         });
+        endTime=System.nanoTime();
+        elapsedTime=endTime-startTIme;
+        System.out.println("execution time to fetch questions and answers in ms"+elapsedTime/1000000);
 
         return new RestResponse("success", tests, null);
     }

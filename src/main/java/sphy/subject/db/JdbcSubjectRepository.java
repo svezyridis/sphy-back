@@ -88,7 +88,7 @@ public class JdbcSubjectRepository implements SubjectRepository {
                 "units=ifnull(?,units),general=ifnull(?,general)  WHERE ID=?";
         Integer res = -1;
         try {
-            res = jdbcTemplate.update(sql, subject.getDefaultImageID(), subject.getName(), subject.getUnits(), subject.getGeneral(), subject.getURI(), subject.getID());
+            res = jdbcTemplate.update(sql, subject.getDefaultImageID(), subject.getName(), subject.getUnits(), subject.getGeneral(), subject.getID());
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
