@@ -12,22 +12,18 @@ import sphy.Validator;
 import sphy.auth.db.UserRepository;
 import sphy.evaluation.db.ClassRepository;
 import sphy.evaluation.db.TestRepository;
-import sphy.evaluation.models.Answer;
 import sphy.evaluation.models.Classroom;
 import sphy.evaluation.models.NewTest;
 import sphy.evaluation.models.Test;
-import sphy.subject.controllers.CategoryController;
 import sphy.subject.db.QuestionRepository;
-import sphy.subject.models.Image;
-import sphy.subject.models.Question;
-import sphy.subject.models.Option;
+
 
 import java.util.List;
 
 @RestController
 public class TestController {
 
-    Logger logger = LoggerFactory.getLogger(CategoryController.class);
+    Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -39,10 +35,6 @@ public class TestController {
     @Autowired
     @Qualifier("jdbcUserRepository")
     private UserRepository userRepository;
-
-    @Autowired
-    @Qualifier("jdbcQuestionRepository")
-    private QuestionRepository questionRepository;
 
     @Autowired
     @Qualifier("jdbcTestRepository")
@@ -78,6 +70,7 @@ public class TestController {
         if(result==-1)
             return new RestResponse("error", null, "test could not be created");
         test.setID(result);
+        System.out.println(test.getID());
         result=testRepository.addQuestionsToTest(test.getID(),newTest.getCategoryIDs(),newTest.getNoOfQuestions());
         if(result==-1)
             return new RestResponse("error", null, "questions could not be added");
@@ -86,7 +79,6 @@ public class TestController {
 
     @RequestMapping("tests")
     public RestResponse getAllTestsOfClass(@RequestParam(value = "classID") Integer classroomID, @CookieValue(value = "jwt", defaultValue = "token") String token) {
-        long startTIme=System.nanoTime();
         if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
             return new RestResponse("error", null, "invalid token");
         Integer userID = validator.getUserID(token);
@@ -105,30 +97,13 @@ public class TestController {
             if (!classCreatorUnitID.equals(requesterUnit))
                 return new RestResponse("error", null, "this class does not belong to your unit");
         }
+        long startTIme=System.nanoTime();
+        List<Test> tests = testRepository.getAllTestsOfClass(classroomID);
+        if (tests==null)
+            return new RestResponse("error", null, "tests could not be fetched");
         long endTime=System.nanoTime();
         long elapsedTime=endTime-startTIme;
-        System.out.println("execution time to validate in ms"+elapsedTime/1000000);
-        startTIme=System.nanoTime();
-        List<Test> tests = testRepository.getAllTestsOfClass(classroomID);
-        endTime=System.nanoTime();
-        elapsedTime=endTime-startTIme;
         System.out.println("execution time to get tests in ms"+elapsedTime/1000000);
-        startTIme=System.nanoTime();
-        tests.forEach(test -> {
-            List<Question> questions = testRepository.getAllQuestionsOfTest(test.getID());
-            for (Question question : questions) {
-                List<Option> options = questionRepository.getOptionsOfQuestion(question.getID());
-                question.setOptionList(options);
-                Image image = questionRepository.getImageOfQuestion((question.getImageID()));
-                question.setImage(image);
-            }
-            test.setQuestions(questions);
-            test.setAnswers(testRepository.getAllAnswersOfTest(test.getID()));
-        });
-        endTime=System.nanoTime();
-        elapsedTime=endTime-startTIme;
-        System.out.println("execution time to fetch questions and answers in ms"+elapsedTime/1000000);
-
         return new RestResponse("success", tests, null);
     }
 

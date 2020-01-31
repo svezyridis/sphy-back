@@ -57,4 +57,16 @@ public class Question {
     public void setOptionList(List<Option> optionList) {
         this.optionList = optionList;
     }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "ID=" + ID +
+                ", text='" + text + '\'' +
+                ", answerReference='" + answerReference + '\'' +
+                ", optionList=" + optionList +
+                ", imageID=" + imageID +
+                ", image=" + image +
+                '}';
+    }
 }

@@ -1,9 +1,19 @@
 package sphy.evaluation.models;
 
+import java.util.List;
+
 public class NewTest {
     Test test;
-    Integer [] categoryIDs;
+    List<Integer> categoryIDs;
     Integer noOfQuestions;
+
+    public List<Integer> getCategoryIDs() {
+        return categoryIDs;
+    }
+
+    public void setCategoryIDs(List<Integer> categoryIDs) {
+        this.categoryIDs = categoryIDs;
+    }
 
     public Test getTest() {
         return test;
@@ -11,14 +21,6 @@ public class NewTest {
 
     public void setTest(Test test) {
         this.test = test;
-    }
-
-    public Integer[] getCategoryIDs() {
-        return categoryIDs;
-    }
-
-    public void setCategoryIDs(Integer[] categoryIDs) {
-        this.categoryIDs = categoryIDs;
     }
 
     public Integer getNoOfQuestions() {
