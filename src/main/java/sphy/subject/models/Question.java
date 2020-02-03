@@ -9,6 +9,33 @@ public class Question {
     private List<Option> optionList;
     private Integer imageID;
     private  Image image;
+    private String subject;
+    private String branch;
+    private String category;
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 
     public Integer getImageID() {
         return imageID;

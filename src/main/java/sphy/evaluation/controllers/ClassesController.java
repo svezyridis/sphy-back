@@ -94,7 +94,7 @@ public class ClassesController {
 
     @GetMapping(value = "classes")
     public RestResponse getAllClassesOf(@CookieValue(value = "jwt", defaultValue = "token") String token) {
-        if (!(validator.validateAdminToken(token) || validator.validateTeacherToken(token) || validator.validateUnitAdminToken(token)))
+        if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "invalid token");
         Integer userID = validator.getUserID(token);
         if (userID == null)
@@ -107,7 +107,7 @@ public class ClassesController {
                 if (classrooms == null)
                     return new RestResponse("error", null, "classrooms could not be fetched");
                 classrooms.forEach(classroom -> {
-                    classroom.setStudents(userRepository.getAllUsersOfClass(classroom.getID()));
+                    classroom.setStudents(classRepository.getAllStudentsOfClass(classroom.getID()));
                 });
                 return new RestResponse("success", classrooms, null);
             case Constants.UNIT_ADMIN:
@@ -115,7 +115,7 @@ public class ClassesController {
                 if (classrooms == null)
                     return new RestResponse("error", null, "classrooms could not be fetched");
                 classrooms.forEach(classroom -> {
-                    classroom.setStudents(userRepository.getAllUsersOfClass(classroom.getID()));
+                    classroom.setStudents(classRepository.getAllStudentsOfClass(classroom.getID()));
                 });
                 return new RestResponse("success", classrooms, null);
             case Constants.ADMIN:
@@ -123,7 +123,15 @@ public class ClassesController {
                 if (classrooms == null)
                     return new RestResponse("error", null, "classrooms could not be fetched");
                 classrooms.forEach(classroom -> {
-                    classroom.setStudents(userRepository.getAllUsersOfClass(classroom.getID()));
+                    classroom.setStudents(classRepository.getAllStudentsOfClass(classroom.getID()));
+                });
+                return new RestResponse("success", classrooms, null);
+            case Constants.USER:
+                classrooms=classRepository.getAllCLassesOfStudent(userID);
+                if (classrooms == null)
+                    return new RestResponse("error", null, "classrooms could not be fetched");
+                classrooms.forEach(classroom -> {
+                    classroom.setStudents(classRepository.getAllStudentsOfClass(classroom.getID()));
                 });
                 return new RestResponse("success", classrooms, null);
         }

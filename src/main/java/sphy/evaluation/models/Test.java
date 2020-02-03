@@ -13,7 +13,7 @@ public class Test {
     String name;
     //in minutes
     Integer duration;
-    Date creationDate;
+    Timestamp creationTime;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm")
     Timestamp activationTime;
     List<Question> questions;
@@ -61,12 +61,12 @@ public class Test {
         this.duration = duration;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public Timestamp getCreationTime() {
+        return creationTime;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setCreationTime(Timestamp creationTime) {
+        this.creationTime = creationTime;
     }
 
     public Timestamp getActivationTime() {
@@ -100,10 +100,11 @@ public class Test {
                 ", classID=" + classID +
                 ", name='" + name + '\'' +
                 ", duration=" + duration +
-                ", creationDate=" + creationDate +
+                ", creationTime=" + creationTime +
                 ", activationTime=" + activationTime +
                 ", questions=" + questions +
                 ", answers=" + answers +
+                ", completionTime=" + completionTime +
                 '}';
     }
 }

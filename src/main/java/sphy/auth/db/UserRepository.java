@@ -15,7 +15,6 @@ public interface UserRepository {
     Integer deleteUser(Integer userID);
     List<Role> getRoles();
     List<Unit> getUnits();
-    List<User> getAllUsersOfClass(Integer classID);
     Integer getUnitID(Integer userID);
     List<User> findAllUsersOfUnit(Integer unitID);
 }

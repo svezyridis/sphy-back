@@ -12,6 +12,7 @@ import sphy.subject.db.SubjectRepository;
 import sphy.subject.models.*;
 import sphy.RestResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -31,25 +32,18 @@ public class QuestionController {
     @Autowired
     Validator validator;
 
-    @RequestMapping("/question/{subject}")
-    public RestResponse getQuestionsBySubject(@PathVariable String subject, @CookieValue(value = "jwt", defaultValue = "token") String token) {
-        logger.info("[QuestionController]:[getQuestionsBySubject]:{subject: "+subject+" }");
+    @RequestMapping("/questions")
+    public RestResponse getQuestionsOfCategories(@RequestParam(value = "categoryIDs") List<Integer> categoryIDs, @CookieValue(value = "jwt", defaultValue = "token") String token) {
+        logger.info("[QuestionController]:[getQuestionsOfCategories]:{IDs: "+categoryIDs+" }");
         if (!validator.simpleValidateToken(token))
             return new RestResponse("error", null, "invalid token");
-        Subject sub=subjectRepository.getSubjectByURI(subject);
-        if(sub==null)
-            return new RestResponse("error",null,"subject does not exist");
-        List<Question> questions = questionRepository.getQuestionsOfSubject(sub.getID());
-        for (Question question : questions) {
-            List<Option> options = questionRepository.getOptionsOfQuestion(question.getID());
-            question.setOptionList(options);
-            Image image=questionRepository.getImageOfQuestion((question.getImageID()));
-            question.setImage(image);
-        }
+        List<Question>questions=questionRepository.getQuestionsOfCategories(categoryIDs);
+        if(questions==null)
+            return new RestResponse("error", null, "questions could not be fetched");
         return new RestResponse("success", questions,null);
     }
 
-    @PostMapping("/question/{subject}")
+    @PostMapping("/questions/{subject}")
     public RestResponse createQuestion(@PathVariable String subject, @CookieValue(value = "jwt", defaultValue = "token") String token, @RequestBody NewQuestion questionToAdd){
         logger.info("[QuestionController]:[createQuestion]:{subject: "+subject+" }");
         if (!validator.validateAdminToken(token))
@@ -66,7 +60,7 @@ public class QuestionController {
         return new RestResponse("success",null,"question created successfully");
     }
 
-    @DeleteMapping("/question/{questionID}")
+    @DeleteMapping("/questions/{questionID}")
     public RestResponse deleteQuestion(@PathVariable Integer questionID,@CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[QuestionController]:[deleteQuestion]:{questionID: "+questionID+" }");
         if(!questionRepository.checkIfExists(questionID))

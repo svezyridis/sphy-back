@@ -10,7 +10,7 @@ public class Classroom {
     String name;
     Integer creatorID;
     Date creationDate;
-    List<User> students;
+    List<Student> students;
     List<Test> tests;
     Integer noOfTests;
     String unit;
@@ -40,11 +40,11 @@ public class Classroom {
         this.tests = tests;
     }
 
-    public List<User> getStudents() {
+    public List<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<User> students) {
+    public void setStudents(List<Student> students) {
         this.students = students;
     }
 

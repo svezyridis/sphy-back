@@ -10,9 +10,8 @@ public interface TestRepository {
     Integer createTest(Test test);
     Integer submitAnswers(Integer testID, Integer studentID, Answer[] answers);
     List<Test> getAllTestsOfClass(Integer classID);
-    List<Question> getAllQuestionsOfTest(Integer testID);
-    List<Answer> getAllAnswersOfTest(Integer testID);
     Integer updateTest(Test test);
     Test getTestByID(Integer testID);
     Integer addQuestionsToTest(Integer testID,List<Integer> categoryIDs,Integer noOfQuestions);
+    Integer deleteTest(Integer testID);
 }

@@ -41,7 +41,7 @@ public class JdbcTestRepository implements TestRepository {
             test.setClassID(rs.getInt("classID"));
             test.setName(rs.getString("name"));
             test.setDuration(rs.getInt("duration"));
-            test.setCreationDate(rs.getDate("creationDate"));
+            test.setCreationTime(rs.getTimestamp("creationTime"));
             test.setActivationTime(rs.getTimestamp("activationTime"));
             test.setCompletionTime(rs.getTimestamp("completionTime"));
             return test;
@@ -139,6 +139,11 @@ public class JdbcTestRepository implements TestRepository {
                             newSubject = false;
                         }
                         if (currentTest != null) {
+                            if (currentAnswer != null)
+                                answers.add(currentAnswer);
+                            if (currentQuestion != null)
+                                currentQuestion.setOptionList(options);
+                                questions.add(currentQuestion);
                             currentTest.setAnswers(answers);
                             currentTest.setQuestions(questions);
                             result.add(currentTest);
@@ -159,7 +164,7 @@ public class JdbcTestRepository implements TestRepository {
             test.setClassID(rs.getInt("classID"));
             test.setName(rs.getString("name"));
             test.setDuration(rs.getInt("duration"));
-            test.setCreationDate(rs.getDate("creationDate"));
+            test.setCreationTime(rs.getTimestamp("creationTime"));
             test.setActivationTime(rs.getTimestamp("activationTime"));
             test.setCompletionTime(rs.getTimestamp("completionTime"));
         } catch (SQLException e) {
@@ -212,30 +217,6 @@ public class JdbcTestRepository implements TestRepository {
     }
 
     @Override
-    public List<Question> getAllQuestionsOfTest(Integer testID) {
-        String sql = "SELECT * FROM TEST_QUESTION inner join SPHY.QUESTION ON TEST_QUESTION.questionID = QUESTION.ID WHERE TEST_QUESTION.testID=?";
-        try {
-            return jdbcTemplate.query(sql,
-                    new Object[]{testID},
-                    new RowMappers.QuestionRowMapper());
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-
-    @Override
-    public List<Answer> getAllAnswersOfTest(Integer testID) {
-        String sql = "SELECT * FROM TEST_ANSWER INNER JOIN TEST_QUESTION TQ on TEST_ANSWER.questionID = TQ.ID WHERE testID=?";
-        try {
-            return jdbcTemplate.query(sql,
-                    new Object[]{testID},
-                    new AnswerRowMapper());
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-
-    @Override
     public Integer updateTest(Test test) {
         String sql = "UPDATE  TEST SET activationTime=ifnull(?,activationTime),completionTime=ifnull(?,completionTime) WHERE ID=?";
         Integer res = -1;
@@ -265,17 +246,29 @@ public class JdbcTestRepository implements TestRepository {
         parameters.addValue("IDs", categoryIDs);
         parameters.addValue("testID", testID);
         parameters.addValue("noOfQuestions", noOfQuestions);
-        Integer res=-1;
+        Integer res = -1;
         String sql = "INSERT INTO TEST_QUESTION (questionID, testID)  " +
                 "SELECT QUESTION.ID,:testID AS ID FROM QUESTION INNER JOIN SUBJECT S on QUESTION.subjectID = S.ID " +
                 "INNER JOIN CATEGORY C on S.categoryID = C.ID WHERE categoryID IN (:IDs) ORDER BY RAND() LIMIT :noOfQuestions";
         try {
-            res=namedParameterJdbcTemplate.update(sql, parameters);
+            res = namedParameterJdbcTemplate.update(sql, parameters);
             System.out.println(res);
             return res;
         } catch (DataAccessException e) {
             e.printStackTrace();
             return -1;
         }
+    }
+
+    @Override
+    public Integer deleteTest(Integer testID) {
+        String sql = "DELETE FROM TEST WHERE ID=?";
+        Integer res = -1;
+        try {
+            res = jdbcTemplate.update(sql, testID);
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 }

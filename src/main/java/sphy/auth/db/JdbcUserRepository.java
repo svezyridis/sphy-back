@@ -179,18 +179,6 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> getAllUsersOfClass(Integer classID) {
-        String sql = "select role,firstName,lastName,SN,username,password,USER.ID as ID, rank, UNIT.NAME as unit, unitID, roleID " +
-                "from USER  inner join ROLE  on USER.roleId=ROLE.ID " +
-                "INNER JOIN UNIT on USER.unitID = UNIT.ID " +
-                "INNER JOIN CLASS_STUDENT CS on USER.ID = CS.userID where CS.classID = ?";
-        return jdbcTemplate.query(sql,
-                new Object[]{classID},
-                new UserRowMapper()
-        );
-    }
-
-    @Override
     public Integer getUnitID(Integer userID) {
         String sql = "SELECT unitID FROM USER WHERE ID = ?";
         try {
