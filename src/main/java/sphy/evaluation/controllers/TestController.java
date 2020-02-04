@@ -157,6 +157,8 @@ public class TestController {
         if (!classRepository.isStudent(classroomID, userID)) {
             return new RestResponse("error", null, "you are not a student of this class");
         }
+        if(testRepository.hasSubmitted(userID,testID))
+            return new RestResponse("error", null, "you have already submitted your answers");
         Integer result = testRepository.submitAnswers(userID,answers);
         if (result == -1)
             return new RestResponse("error", null, "answers could not be submitted");

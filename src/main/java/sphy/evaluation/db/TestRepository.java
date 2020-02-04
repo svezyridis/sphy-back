@@ -14,4 +14,5 @@ public interface TestRepository {
     Test getTestByID(Integer testID);
     Integer addQuestionsToTest(Integer testID,List<Integer> categoryIDs,Integer noOfQuestions);
     Integer deleteTest(Integer testID);
+    boolean hasSubmitted(Integer userID,Integer testID);
 }

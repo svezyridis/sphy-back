@@ -295,4 +295,24 @@ public class JdbcTestRepository implements TestRepository {
         }
         return res;
     }
+
+    @Override
+    public boolean hasSubmitted(Integer userID, Integer testID) {
+        String sql = "SELECT TA.ID FROM TEST_ANSWER TA INNER JOIN TEST_QUESTION TQ on TA.questionID = TQ.ID INNER JOIN TEST T on TQ.testID = T.ID WHERE T.ID=? AND  TA.userID=?";
+        try {
+            Integer result=jdbcTemplate.queryForObject(sql,
+                    new Object[]{testID,userID},(resultSet, i) ->{
+                        int size =0;
+                        if (resultSet != null)
+                        {
+                            resultSet.last();    // moves cursor to the last row
+                            size = resultSet.getRow(); // get row id
+                        }
+                        return size;
+                    });
+            return result>0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
 }
