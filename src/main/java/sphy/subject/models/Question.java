@@ -12,6 +12,15 @@ public class Question {
     private String subject;
     private String branch;
     private String category;
+    private Integer testQuestionID;
+
+    public Integer getTestQuestionID() {
+        return testQuestionID;
+    }
+
+    public void setTestQuestionID(Integer testQuestionID) {
+        this.testQuestionID = testQuestionID;
+    }
 
     public String getBranch() {
         return branch;

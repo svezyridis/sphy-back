@@ -3,6 +3,7 @@ package sphy.evaluation.db;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -82,8 +83,30 @@ public class JdbcTestRepository implements TestRepository {
     }
 
     @Override
-    public Integer submitAnswers(Integer testID, Integer studentID, Answer[] answers) {
-        return null;
+    public Integer submitAnswers( Integer studentID, List<Answer> answers) {
+        int res = -1;
+        String sql = "INSERT INTO TEST_ANSWER (userID, questionID, choiceID) VALUES (?,?,?)";
+        try {
+            int[] rows = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                    preparedStatement.setInt(1, studentID);
+                    preparedStatement.setInt(2, answers.get(i).getQuestionID());
+                    preparedStatement.setInt(3, answers.get(i).getChoiceID());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return answers.size();
+                }
+            });
+            res = 0;
+            for (int row : rows)
+                res += row;
+        } catch (DataAccessException e) {
+            return res;
+        }
+        return res;
     }
 
     @Override
@@ -177,6 +200,7 @@ public class JdbcTestRepository implements TestRepository {
     private Question mapQuestion(ResultSet resultSet) {
         Question question = new Question();
         try {
+            question.setTestQuestionID(resultSet.getInt("testQuestionID"));
             question.setID(resultSet.getInt("questionID"));
             question.setAnswerReference(resultSet.getString("answerReference"));
             question.setText(resultSet.getString("questionText"));

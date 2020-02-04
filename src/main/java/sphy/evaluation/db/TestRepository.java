@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TestRepository {
     Integer createTest(Test test);
-    Integer submitAnswers(Integer testID, Integer studentID, Answer[] answers);
+    Integer submitAnswers(Integer studentID, List<Answer> answers);
     List<Test> getAllTestsOfClass(Integer classID);
     Integer updateTest(Test test);
     Test getTestByID(Integer testID);

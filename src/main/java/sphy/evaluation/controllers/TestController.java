@@ -12,6 +12,7 @@ import sphy.Validator;
 import sphy.auth.db.UserRepository;
 import sphy.evaluation.db.ClassRepository;
 import sphy.evaluation.db.TestRepository;
+import sphy.evaluation.models.Answer;
 import sphy.evaluation.models.Classroom;
 import sphy.evaluation.models.NewTest;
 import sphy.evaluation.models.Test;
@@ -139,6 +140,27 @@ public class TestController {
         if (result == -1)
             return new RestResponse("error", null, "test could not be updated");
         return new RestResponse("success", null, "test updated successfully");
+    }
+
+    @PostMapping("tests/{testID}")
+    public RestResponse postAnswers(@PathVariable Integer testID, @RequestBody List<Answer> answers, @CookieValue(value = "jwt", defaultValue = "token") String token) {
+        if (!(validator.simpleValidateToken(token)))
+            return new RestResponse("error", null, "invalid token");
+        Integer userID = validator.getUserID(token);
+        if (userID == null)
+            return new RestResponse("error", null, "user id not found in token");
+        Test oldTest = testRepository.getTestByID(testID);
+        if (oldTest == null)
+            return new RestResponse("error", null, "test not found");
+        Integer classroomID = oldTest.getClassID();
+        Classroom classroom = classRepository.getClassByID(classroomID);
+        if (!classRepository.isStudent(classroomID, userID)) {
+            return new RestResponse("error", null, "you are not a student of this class");
+        }
+        Integer result = testRepository.submitAnswers(userID,answers);
+        if (result == -1)
+            return new RestResponse("error", null, "answers could not be submitted");
+        return new RestResponse("success", null, "answers submitted successfully");
     }
 
     @DeleteMapping("tests/{testID}")
