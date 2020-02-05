@@ -193,4 +193,21 @@ public class TestController {
         return new RestResponse("success", null, "test deleted successfully");
     }
 
+    @RequestMapping("tests/{testID}")
+    public RestResponse getTest(@PathVariable Integer testID, @CookieValue(value = "jwt", defaultValue = "token") String token) {
+        if (!(validator.simpleValidateToken(token)))
+            return new RestResponse("error", null, "invalid token");
+        Integer userID = validator.getUserID(token);
+        if (userID == null)
+            return new RestResponse("error", null, "user id not found in token");
+        Test test = testRepository.getTestByID(testID);
+        if (test == null)
+            return new RestResponse("error", null, "test not found");
+        Integer classroomID = test.getClassID();
+        String role = validator.getUserRole(token);
+        Classroom classroom = classRepository.getClassByID(classroomID);
+        if (role.equals(Constants.USER) && !classRepository.isStudent(classroomID, userID))
+            return new RestResponse("error", null, "you are not a student of this class");
+        return new RestResponse("success", null, "test deleted successfully");
+    }
 }

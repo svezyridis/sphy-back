@@ -4,11 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import sphy.RestResponse;
 import sphy.Validator;
 import sphy.auth.models.NewUser;
+import sphy.image.storage.FileSystemStorageService;
+import sphy.image.storage.StorageException;
+import sphy.image.storage.StorageFileNotFoundException;
 import sphy.subject.db.CategoryRepository;
 import sphy.subject.models.*;
 import sphy.subject.db.SubjectRepository;
@@ -34,6 +38,14 @@ public class SubjectController {
     Validator validator;
 
     Logger logger = LoggerFactory.getLogger(SubjectController.class);
+
+    @Autowired
+    FileSystemStorageService storageService;
+
+    @ExceptionHandler(StorageException.class)
+    public RestResponse handleStorageFileNotFound(StorageException exc) {
+        return new RestResponse("error",null,"some images could not be deleted");
+    }
 
 
     /**
@@ -76,19 +88,7 @@ public class SubjectController {
         return new RestResponse("success", subject, null);
     }
 
-    /**
-     * Creates a new subject
-     *
-     * @param token JWT token
-     * @param weapon
-     * @param category
-     * @param newSubject Json body of the form:
-     *                     newSubject:{
-     *                     name,
-     *                     text
-     *                     }
-     * @return error message if any success with the new subject created otherwise
-     */
+
     @PostMapping(value = "subject/{weapon}/{category}")
     public RestResponse createSubject(@CookieValue(value = "jwt", defaultValue = "token") String token, @PathVariable String weapon, @PathVariable String category, @RequestBody Subject subject) {
         logger.info("[SubjectController]:[createSubject]:{category: "+category+", weapon: "+weapon+" subject: "+subject+" }");
@@ -157,7 +157,7 @@ public class SubjectController {
         Integer result=subjectRepository.deleteSubject(subjectID);
         if(result==-1)
             return new RestResponse("error", null, "subject could not be deleted");
-        //TODO delete images from file system
+        storageService.deleteDirectory(weapon+'/'+category+'/'+subject);
         return new RestResponse("success", null, "subject deleted successfully");
     }
 

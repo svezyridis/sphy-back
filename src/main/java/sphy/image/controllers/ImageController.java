@@ -28,16 +28,12 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 public class ImageController {
-    private final FileSystemStorageService storageService;
+    @Autowired
+    FileSystemStorageService storageService;
     Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     @Autowired
     Validator validator;
-
-    @Autowired
-    public ImageController(FileSystemStorageService storageService) {
-        this.storageService = storageService;
-    }
 
     @Autowired
     @Qualifier("jdbcCategoryRepository")

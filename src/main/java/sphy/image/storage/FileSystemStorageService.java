@@ -8,6 +8,7 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 @Service
@@ -98,6 +100,19 @@ public class FileSystemStorageService  {
             return Files.deleteIfExists(pathToDelete);
         }
         catch (IOException e){
+            throw new StorageException("Could not delete file", e);
+        }
+    }
+
+    public boolean deleteDirectory(String relativePath){
+        try{
+            Path pathToBeDeleted=rootLocation.resolve((Paths.get(relativePath)));
+             Files.walk(pathToBeDeleted)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+             return true;
+        } catch (IOException e) {
             throw new StorageException("Could not delete file", e);
         }
     }
