@@ -41,4 +41,13 @@ public class Answer {
         this.ID = ID;
     }
 
+    @Override
+    public String toString() {
+        return "Answer{" +
+                "ID=" + ID +
+                ", userID=" + userID +
+                ", questionID=" + questionID +
+                ", choiceID=" + choiceID +
+                '}';
+    }
 }

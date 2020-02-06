@@ -17,4 +17,6 @@ public interface UserRepository {
     List<Unit> getUnits();
     Integer getUnitID(Integer userID);
     List<User> findAllUsersOfUnit(Integer unitID);
+
+    Integer createUnit(String name);
 }

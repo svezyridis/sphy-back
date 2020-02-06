@@ -7,13 +7,17 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import sphy.auth.models.Role;
 import sphy.auth.models.Unit;
 import sphy.auth.models.User;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 
@@ -199,6 +203,26 @@ public class JdbcUserRepository implements UserRepository {
                 new Object[]{unitID},
                 new UserRowMapper()
         );
+    }
+
+    @Override
+    public Integer createUnit(String name) {
+        String sql = "INSERT INTO UNIT (name) VALUE (?)";
+        int res=-1;
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1,name);
+                return ps;
+            }, keyHolder);
+            return  keyHolder.getKey().intValue();
+        }
+        catch (DataAccessException e){
+            e.printStackTrace();
+        }
+        return res;
     }
 }
 

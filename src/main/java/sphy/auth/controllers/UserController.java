@@ -264,6 +264,19 @@ public class UserController {
             return new RestResponse("error", null, "units could not be fetched");
         return new RestResponse("success",units,null);
     }
+    @PostMapping(value = "/units")
+    public RestResponse createUnit(@CookieValue(value = "jwt", defaultValue = "token") String token, @RequestBody String name){
+        if(!(validator.validateAdminToken(token)||validator.validateTeacherToken(token)||validator.validateUnitAdminToken(token)))
+            return new RestResponse("error", null, "invalid token");
+        Integer result=userRepository.createUnit(name);
+        if(result==-1)
+            return new RestResponse("error", null, "unit could not be created");
+        Unit unit=new Unit();
+        unit.setID(result);
+        unit.setName(name);
+        return new RestResponse("success",unit,"unit successfully created");
+    }
+
 
     private boolean verifyNewUser(User user) {
         logger.info("[UserController]:[verifyNewUser]:{user : "+user+"}");

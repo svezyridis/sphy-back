@@ -144,6 +144,7 @@ public class TestController {
 
     @PostMapping("tests/{testID}")
     public RestResponse postAnswers(@PathVariable Integer testID, @RequestBody List<Answer> answers, @CookieValue(value = "jwt", defaultValue = "token") String token) {
+        //TODO check if test is completed
         if (!(validator.simpleValidateToken(token)))
             return new RestResponse("error", null, "invalid token");
         Integer userID = validator.getUserID(token);
@@ -159,6 +160,8 @@ public class TestController {
         }
         if(testRepository.hasSubmitted(userID,testID))
             return new RestResponse("error", null, "you have already submitted your answers");
+        for(Answer answer:answers)
+            System.out.println(answer.getChoiceID());
         Integer result = testRepository.submitAnswers(userID,answers);
         if (result == -1)
             return new RestResponse("error", null, "answers could not be submitted");
@@ -208,6 +211,6 @@ public class TestController {
         Classroom classroom = classRepository.getClassByID(classroomID);
         if (role.equals(Constants.USER) && !classRepository.isStudent(classroomID, userID))
             return new RestResponse("error", null, "you are not a student of this class");
-        return new RestResponse("success", null, "test deleted successfully");
+        return new RestResponse("success", test, null);
     }
 }

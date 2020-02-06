@@ -19,10 +19,7 @@ import sphy.subject.db.RowMappers;
 import sphy.subject.models.Option;
 import sphy.subject.models.Question;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,7 +89,10 @@ public class JdbcTestRepository implements TestRepository {
                 public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                     preparedStatement.setInt(1, studentID);
                     preparedStatement.setInt(2, answers.get(i).getQuestionID());
-                    preparedStatement.setInt(3, answers.get(i).getChoiceID());
+                    if(answers.get(i).getChoiceID()==null)
+                        preparedStatement.setNull(3, Types.INTEGER);
+                    else
+                        preparedStatement.setInt(3, answers.get(i).getChoiceID());
                 }
 
                 @Override
@@ -254,12 +254,52 @@ public class JdbcTestRepository implements TestRepository {
 
     @Override
     public Test getTestByID(Integer testID) {
-        String sql = "SELECT * FROM TEST WHERE ID=?";
+        String sql = "SELECT * FROM  TOTAL_TEST WHERE  ID= ? order by ID,questionID,optionID";
         try {
-            return jdbcTemplate.queryForObject(sql,
+            return jdbcTemplate.query(sql,
                     new Object[]{testID},
-                    new TestRowMapper());
+                    resultSet -> {
+                        Test test = null;
+                        List<Question> questions = new ArrayList<>();
+                        List<Answer> answers = new ArrayList<>();
+                        List<Option> options = new ArrayList<>();
+                        Question currentQuestion = null;
+                        Answer currentAnswer = null;
+                        while (resultSet.next()) {
+                            if (test == null) { //initial object
+                                test = mapTest(resultSet);
+                            }
+                            Integer questionID = resultSet.getInt("questionID");
+                            if (currentQuestion == null) {//new or empty
+                                currentQuestion = mapQuestion(resultSet);
+                            } else if (currentQuestion.getID() != questionID) { //break
+                                currentQuestion.setOptionList(options);
+                                questions.add(currentQuestion);
+                                currentQuestion = mapQuestion(resultSet);
+                                options = new ArrayList<>();
+                            }
+                            options.add(mapOption(resultSet));
+                            Integer answerID = resultSet.getInt("TAID");
+                            if (currentAnswer == null) {//new or empty
+                                currentAnswer = mapAnswer(resultSet);
+                            } else if (currentAnswer.getID() != answerID) {
+                                answers.add(currentAnswer);
+                                currentAnswer = mapAnswer(resultSet);
+                            }
+                        }
+                        if (test != null) {
+                            if (currentAnswer != null)
+                                answers.add(currentAnswer);
+                            if (currentQuestion != null)
+                                currentQuestion.setOptionList(options);
+                            questions.add(currentQuestion);
+                            test.setAnswers(answers);
+                            test.setQuestions(questions);
+                        }
+                        return test;
+                    });
         } catch (EmptyResultDataAccessException e) {
+            e.printStackTrace();
             return null;
         }
     }
