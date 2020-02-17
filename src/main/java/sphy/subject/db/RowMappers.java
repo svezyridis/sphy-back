@@ -47,7 +47,6 @@ public class RowMappers {
             question.setAnswerReference(resultSet.getString("answerReference"));
             question.setText(resultSet.getString("text"));
             question.setImageID(resultSet.getInt("imageID"));
-            question.setSubject(resultSet.getString("subject"));
             return question;
         }
     }

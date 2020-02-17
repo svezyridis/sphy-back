@@ -9,8 +9,9 @@ import java.util.List;
 public interface QuestionRepository {
     List<Option> getOptionsOfQuestion(Integer questionID);
     Image getImageOfQuestion(Integer imageID);
-    Integer createQuestion(Integer subjectID,Question question);
+    Integer createQuestions(Integer subjectID,List<Question> questions);
     Integer deleteQuestion(Integer questionID);
     boolean checkIfExists(Integer questionID);
     List<Question> getQuestionsOfCategories(List<Integer> categoryIDs);
+    List<Question> getQuestionsOfSubject(Integer subjectID);
 }

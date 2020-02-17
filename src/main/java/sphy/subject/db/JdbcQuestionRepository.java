@@ -3,16 +3,21 @@ package sphy.subject.db;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import sphy.subject.models.Image;
 import sphy.subject.models.Option;
 import sphy.subject.models.Question;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 @Repository
@@ -48,17 +53,39 @@ public class JdbcQuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public Integer createQuestion(Integer subjectID, Question question) {
-        String sql = "INSERT INTO QUESTION (text, subjectID, answerReference) VALUES (?,?,?)";
+    public Integer createQuestions(Integer subjectID, List<Question> questions) {
+        String sql = "INSERT INTO QUESTION (text, subjectid, answerreference) VALUES (?,?,ifnull(?,''))";
         int res=0;
-        try {
-            res =jdbcTemplate.update(sql, question.getText(),subjectID,question.getAnswerReference());
-        }
-        catch (DataAccessException e){
-            e.printStackTrace();
+        for(Question question:questions){
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            try {
+                jdbcTemplate.update(connection -> {
+                    PreparedStatement ps = connection
+                            .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setString(1,question.getText());
+                    ps.setInt(2,subjectID);
+                    ps.setString(3,question.getAnswerReference());
+                    return ps;
+                }, keyHolder);
+                int questionID=keyHolder.getKey().intValue();
+                String sql2 = "INSERT INTO OPTIONS (text, correct, questionID) VALUES (?,?,?)";
+                for(Option option:question.getOptionList()){
+                    try {
+                        jdbcTemplate.update(sql2,option.getText(),option.isCorrect(),questionID);
+                    } catch (DataAccessException e) {
+                        res=-1;
+                        e.printStackTrace();
+                    }
+                }
+            }
+            catch (DataAccessException e) {
+                res = -1;
+                e.printStackTrace();
+            }
         }
         return res;
     }
+
 
     @Override
     public Integer deleteQuestion(Integer questionID) {
@@ -120,6 +147,19 @@ public class JdbcQuestionRepository implements QuestionRepository {
                 return result;
             });
         } catch (DataAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<Question> getQuestionsOfSubject(Integer subjectID) {
+        String sql = "select * from QUESTION WHERE subjectID = ? ";
+        try {
+            return jdbcTemplate.query(sql,
+                    new Object[]{subjectID},
+                    new RowMappers.QuestionRowMapper());
+        } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             return null;
         }

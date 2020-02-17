@@ -61,6 +61,7 @@ public class ClassesController {
         RestResponse restResponse=verifyUserRights(token,classID);
         if(restResponse!=null)
             return restResponse;
+        System.out.println(classID);
         Integer result = classRepository.addStudentsToClass(userIDs, classID);
         if (result == -1)
             return new RestResponse("error", null, "users could not be added");

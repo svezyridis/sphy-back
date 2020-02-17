@@ -8,9 +8,11 @@ public class Option {
     private String text;
     private boolean correct;
     private Integer questionID;
+
     public Integer getID() {
         return ID;
     }
+
     public void setID(Integer ID) {
         this.ID = ID;
     }

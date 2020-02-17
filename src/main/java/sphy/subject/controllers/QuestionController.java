@@ -43,18 +43,37 @@ public class QuestionController {
         return new RestResponse("success", questions,null);
     }
 
+    @RequestMapping("/questions/{subject}")
+    public RestResponse getQuestionsOfCategories(@PathVariable String subject, @CookieValue(value = "jwt", defaultValue = "token") String token) {
+        logger.info("[QuestionController]:[getQuestionsOfSubject]:{subject: "+subject+" }");
+        if (!validator.simpleValidateToken(token))
+            return new RestResponse("error", null, "invalid token");
+        Integer subjectID = subjectRepository.getSubjectID(subject);
+        if(subjectID==-1)
+            return new RestResponse("error",null,"subject does not exist");
+        List<Question> questions=questionRepository.getQuestionsOfSubject(subjectID);
+        for (Question question:questions){
+            question.setOptionList(questionRepository.getOptionsOfQuestion(question.getID()));
+        }
+        if(questions==null)
+            return new RestResponse("error", null, "questions could not be fetched");
+        return new RestResponse("success", questions,null);
+    }
+
     @PostMapping("/questions/{subject}")
-    public RestResponse createQuestion(@PathVariable String subject, @CookieValue(value = "jwt", defaultValue = "token") String token, @RequestBody NewQuestion questionToAdd){
+    public RestResponse createQuestion(@PathVariable String subject, @CookieValue(value = "jwt", defaultValue = "token") String token, @RequestBody List<Question> questions){
         logger.info("[QuestionController]:[createQuestion]:{subject: "+subject+" }");
         if (!validator.validateAdminToken(token))
             return new RestResponse("error", null, "invalid ADMIN token");
         Integer subjectID = subjectRepository.getSubjectID(subject);
         if(subjectID==-1)
             return new RestResponse("error",null,"subject does not exist");
-        Question question=questionToAdd.getNewQuestion();
-        if(!validateQuestion(question))
-            return new RestResponse("error",null,"question provided is missing attributes");
-        Integer result=questionRepository.createQuestion(subjectID,question);
+        boolean invalidQuestions=false;
+        for(Question question:questions){
+            if(!validateQuestion(question))
+                return new RestResponse("error",null,"one or more questions provided is missing attributes");
+        }
+        Integer result=questionRepository.createQuestions(subjectID,questions);
         if(result==-1)
             return new RestResponse("error",null,"question could not be created");
         return new RestResponse("success",null,"question created successfully");
@@ -63,6 +82,8 @@ public class QuestionController {
     @DeleteMapping("/questions/{questionID}")
     public RestResponse deleteQuestion(@PathVariable Integer questionID,@CookieValue(value = "jwt", defaultValue = "token") String token){
         logger.info("[QuestionController]:[deleteQuestion]:{questionID: "+questionID+" }");
+        if (!validator.validateAdminToken(token))
+            return new RestResponse("error", null, "invalid ADMIN token");
         if(!questionRepository.checkIfExists(questionID))
             return new RestResponse("error",null,"question does not exist");
         Integer res=questionRepository.deleteQuestion(questionID);
@@ -72,6 +93,6 @@ public class QuestionController {
     }
 
     private boolean validateQuestion(Question question){
-        return question.getAnswerReference()!=null&&question.getText()!=null;
+        return question.getText()!=null;
     }
 }
